@@ -1,18 +1,14 @@
 from pydantic import BaseModel
 from cv2 import Mat
-from typing import Tuple, TypeAlias
+from typing import Tuple, TypeAlias, Literal
 from abc import ABC, abstractmethod
-
 
 class Tile(BaseModel, ABC):
     
     @classmethod
-    def from_image(cls, raw_image: Mat) -> "Tile":
-        pass
-    
     @abstractmethod
-    def calculate(self, city: "City"):
-        '''Return the number of points for this tile.'''
+    def calculate(cls, city: "City"):
+        '''Return the number of points for this type of tile in this city.'''
         pass
     
 TileRow: TypeAlias = Tuple[Tile, Tile, Tile, Tile, Tile]
@@ -28,3 +24,16 @@ class City(BaseModel):
         '''Return the score for the city.'''
         pass
     
+# Just an example of what a tile would look like?
+class TavernTile(Tile):
+    type: Literal['food', 'beverage', 'lodging', 'music']
+    
+    
+    def calculate(cls, city: City):
+        '''Return the number of points for this type of tile in this city.'''
+        pass
+    
+    
+    
+if __name__ == "__main__":
+    pass

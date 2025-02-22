@@ -20,6 +20,9 @@ class City(BaseModel):
     def from_image(cls, raw_image: Mat) -> "City":
         pass
     
+    # Alex: Probably a "from_json" function to aid in developing the scoring?
+    # BaseModel has model_dumps_json to get a template, then you can modify the JSON to your needs.
+    
     def calculate(self):
         '''Return the score for the city.'''
         pass

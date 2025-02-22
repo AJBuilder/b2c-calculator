@@ -3,7 +3,7 @@ import cv2
 import os
 import numpy as np
 import imutils
-
+import time
     
 
 
@@ -97,16 +97,48 @@ if __name__ == "__main__":
     
     
     ###### Find tile centers ######
-    # For now, let's just divide the image into 25 cells.
-    cell_width = int(width / 5)
-    cell_height = int(height / 5)
-    cell_images = []
+    # For now, let's just divide the image into 25 tiles.
+    tile_width = int(width / 5)
+    tile_height = int(height / 5)
+    tile_images = []
     for r in range(0, 5):
         row = []
         for c in range(0,5):
-            row.append(oriented[cell_width * c:cell_width * (c+1), cell_height * r:cell_height * (r+1)] )
-            #cv2.imshow(f"Cell_{r}-{c}", row[-1])
-        cell_images.append(row)
+            row.append(oriented[tile_width * c:tile_width * (c+1), tile_height * r:tile_height * (r+1)] )
+            #cv2.imshow(f"Tile_{r}-{c}", row[-1])
+        tile_images.append(row)
             
-    cv2.waitKey(0)
+    def classify_tile(tile_image):
+        
+        # Get top left symbol. (Top left 1/3)
+        symbol = tile_image[int(tile_width/10):int(tile_width/2), int(tile_height/10):int(tile_height/2)]
+        
+        # Find max color
+        symbol_hsv = cv2.cvtColor(symbol, cv2.COLOR_BGR2HSV)
+        cv2.namedWindow('Trackbars')
+        def update(_):
+            h_min = cv2.getTrackbarPos('Hue Min', 'Trackbars')
+            h_max = cv2.getTrackbarPos('Hue Max', 'Trackbars')
+            s_min = cv2.getTrackbarPos('Sat Min', 'Trackbars')
+            s_max = cv2.getTrackbarPos('Sat Max', 'Trackbars')
+            v_min = cv2.getTrackbarPos('Val Max', 'Trackbars')
+            v_max = cv2.getTrackbarPos('Val Min', 'Trackbars')
+            lower = np.array([h_min, s_min, v_min])
+            upper = np.array([h_max, s_max, v_max])
+            filtered_symbol = cv2.inRange(symbol_hsv, lower, upper)
+            cv2.imshow("Filtered Symbol", filtered_symbol)
+        cv2.createTrackbar('Hue Min', 'Trackbars', 0, 255, update)
+        cv2.createTrackbar('Hue Max', 'Trackbars', 0, 255, update)
+        cv2.createTrackbar('Sat Min', 'Trackbars', 0, 255, update)
+        cv2.createTrackbar('Sat Max', 'Trackbars', 0, 255, update)
+        cv2.createTrackbar('Val Max', 'Trackbars', 0, 255, update)
+        cv2.createTrackbar('Val Min', 'Trackbars', 0, 255, update)
+        cv2.waitKey(0)
+        
+            
+    for row in tile_images:
+        for tile in row:
+            classify_tile(tile)
+
+           
     

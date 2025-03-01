@@ -1,0 +1,165 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ------------------------------------------------------------------------------------------- */
+/* District Scoring Area */
+#district-collapsible {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    color: gray;
+    cursor: pointer;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    padding-left: 5px;
+    padding-right: 5px;
+    width: 100%;
+    border-bottom: 1px solid #aaa;
+    text-align: left;
+    font-size: 100%;
+    cursor: pointer;
+}
+
+#downArrow {
+    color: gray;
+    width: 25px;
+    height: 25px;
+    background-color: transparent;
+    /* This icon was from: https://icons8.com/icons/set/down-arrow--static--middle-gray */
+    background-image: url('/static/icons/icons8-down-arrow-50.png'); /* Gray arrow icon */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    text-decoration: none;
+    overflow: hidden;
+    white-space: nowrap;
+}
+/* ------------------------------------------------------------------------------------------- */
+
+/* ------------------------------------------------------------------------------------------- */
+/* Center the entire district scoring section */
+#district-scoring {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+#district-scoring {
+    display: none;
+    align-items: center;
+    border-bottom: 1px solid #aaa;
+    background-color: #f0f0f0;
+}
+#factory-score {
+    width: 100%;
+    border-bottom: 1px solid #aaa;
+    padding: 7px 5px; 
+}
+#factory-score .label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    color: gray;
+    padding-left: 5px;
+    padding-right: 5px;
+    width: 100%;
+    text-align: left;
+    font-size: 100%;
+}
+
+/* Align label and dropdown side by side */
+.district-row, .factory-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* Adds space between label and dropdown */
+    margin: 5px 0;
+}
+
+/* Ensure labels and dropdowns are properly aligned */
+.label {
+    font-size: 25px;
+    color: gray;
+    text-align: right;
+}
+
+/* Dropdown styling */
+.selection {
+    margin: 0;
+    padding: 0;
+    margin-right: 10px;
+    width: 60px;
+    height: 40px; 
+    text-align: center;
+    font-size: 20px;
+    color: gray; 
+    background-color: white;
+    border: 1px solid #aaa; 
+    border-radius: 0px;
+}
+/* ------------------------------------------------------------------------------------------- */
+
+/* ------------------------------------------------------------------------------------------- */
+/* Image Upload */
+#image-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    height: 100%;
+    width: 100%;
+}
+#image-input {
+    display: none;
+}
+#image-input-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    width: 325px; 
+    background-color: lightgray;
+    border-radius: 20px;
+    cursor: pointer;
+    background-image: url('/static/icons/icons8-camera-100.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+#image-input-label img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    border-radius: 10px;
+}
+#image-form {
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    width: 100%; 
+}
+#image-submit {
+    margin-top: 15px; 
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+/* ------------------------------------------------------------------------------------------- */
+
+/* ------------------------------------------------------------------------------------------- */
+/* Footer */
+#footer {
+    position: fixed;
+    bottom: 0;
+}
+/* ------------------------------------------------------------------------------------------- */

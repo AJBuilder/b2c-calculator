@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Between Two Cities Scorer </title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/index.css') }}">
+    <script src="{{ url_for('static', filename='scripts/index.js') }}"></script>
+</head>
+<body>
+    <div id="page-container">
+
+        <div id="district-selection">
+            <button id="district-collapsible"> <h1>Districts</h1> <a href="#" id="downArrow"></a> </button>
+            
+            <div id="district-scoring">
+                <div class="district-row">
+                    <label class="label" for="district1-dropdown">District 1:</label>
+                    <select class="selection" name="district1-dropdown" id="district1-dropdown">
+                        <option value="Other">0</option>
+                        <option value="First">9</option>
+                        <option value="Second">3</option>
+                    </select>
+                </div>
+                <div class="district-row">
+                    <label class="label" for="district2-dropdown">District 2:</label>
+                    <select class="selection" name="district2-dropdown" id="district2-dropdown">
+                        <option value="Other">0</option>
+                        <option value="First">8</option>
+                        <option value="Second">4</option>
+                    </select>
+                </div>
+                <div class="district-row">
+                    <label class="label" for="district3-dropdown">District 3:</label>
+                    <select class="selection" name="district3-dropdown" id="district3-dropdown">
+                        <option value="Other">0</option>
+                        <option value="First">7</option>
+                        <option value="Second">5</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div id="factory-score">
+            <div class="factory-row">
+                <label class="label" for="factory-dropdown"> <h1>Factory Score:</h1> </label>
+                <select class="selection" name="factory-dropdown" id="factory-dropdown">
+                    <option value="Other">2</option>
+                    <option value="Second">3</option>
+                    <option value="First">4</option>
+                </select>
+            </div>
+        </div>
+        <div id="image-upload">
+            <form id="image-form" method="POST" enctype="multipart/form-data" action="/upload">
+                <label id="image-input-label" for="image-input">  </label>
+                <input id="image-input" type="file" name="image" accept="image/*" capture="environment" id="imageInput">
+                <button id="image-submit" type="submit">Score City</button>
+            </form>
+        </div>
+
+        <div id="footer">
+            <a target="_blank" href="https://icons8.com/icon/2760/expand-arrow">Down Arrow</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+            <br>
+            <a target="_blank" href="https://icons8.com/icon/11772/camera">Camera</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>        </div>
+    </div>
+</body>
+</html>

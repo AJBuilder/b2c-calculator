@@ -21,7 +21,7 @@ def get_index():
 def get_calculator():
     return render_template('index.html')
 
-# upload rout for images
+# upload route for images
 # currently only saves the images in the uploads folder
 # TODO: Pass the images into the image processor and get the score back
 @app.route('/upload', methods=['POST'])

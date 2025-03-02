@@ -51,12 +51,17 @@
                 </select>
             </div>
         </div>
+
         <div id="image-upload">
             <form id="image-form" method="POST" enctype="multipart/form-data" action="/upload">
                 <label id="image-input-label" for="image-input">  </label>
                 <input id="image-input" type="file" name="image" accept="image/*" capture="environment" id="imageInput">
                 <button id="image-submit" type="submit">Score City</button>
             </form>
+        </div>
+
+        <div id="city-board-container">
+            <table id="city-board-tiles"></table>
         </div>
 
         <div id="footer">

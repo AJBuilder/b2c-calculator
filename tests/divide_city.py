@@ -14,13 +14,13 @@ if __name__ == "__main__":
     image = imutils.resize(image, 500)
     #image = imutils.rotate(image, -10) # Test rotation
 
-    cv2.imshow("Image", image)
+    #cv2.imshow("Image", image)
 
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    cv2.imshow("gray", gray)
+    #cv2.imshow("gray", gray)
 
     blur = cv2.GaussianBlur(gray, (51,51), 3)
-    cv2.imshow("blur", blur)
+    #cv2.imshow("blur", blur)
 
     #thresh = None
     #def update(val):
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     #cv2.createTrackbar('C', 'trackbars', 11, 20, update)
     #update(0)
     thresh = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 23, 0)
-    cv2.imshow("thresh", thresh)
+    #cv2.imshow("thresh", thresh)
 
     contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     
@@ -57,18 +57,18 @@ if __name__ == "__main__":
     box = np.intp(box)
     cv2.drawContours(image,[box],0,(0,0,255),2)
     image = cv2.drawMarker(image,box[0],(0,0,255),2)
-    cv2.imshow("Box", image)
+    #cv2.imshow("Box", image)
     
 
     mask = np.zeros_like(gray)
     epsilon = 0.1*cv2.arcLength(city_countour, True)
     approx = cv2.approxPolyDP(city_countour, epsilon, True)
     cv2.drawContours(mask,[approx],0,255,-1)
-    cv2.imshow("mask", mask)
+    #cv2.imshow("mask", mask)
 
     masked = np.zeros_like(gray)
     masked[mask == 255] = blur[mask == 255]
-    cv2.imshow("Masked", masked)
+    #cv2.imshow("Masked", masked)
     
     ###### Orient city ######
     # We do this by using a transformation matrix to warp the image.
@@ -92,53 +92,89 @@ if __name__ == "__main__":
     # Create the matrix
     M = cv2.getPerspectiveTransform(start_pts, end_pts)
     oriented = cv2.warpPerspective(image, M, (width, height))
-    cv2.imshow("Oriented", oriented)
+    #cv2.imshow("Oriented", oriented)
     
     
     
     ###### Find tile centers ######
-    # For now, let's just divide the image into 25 tiles.
-    tile_width = int(width / 5)
-    tile_height = int(height / 5)
-    tile_images = []
-    for r in range(0, 5):
-        row = []
-        for c in range(0,5):
-            row.append(oriented[tile_width * c:tile_width * (c+1), tile_height * r:tile_height * (r+1)] )
-            #cv2.imshow(f"Tile_{r}-{c}", row[-1])
-        tile_images.append(row)
-            
-    def classify_tile(tile_image):
+    tile_searches = {
+        'tavern': [],
+        'civic': [],
+        'factory': [],
+        'office': [],
+        'shop': [],
+        'park': []
+    }
+    tile_colors = {
+        'tavern': (0, 0, 255),
+        'civic': (255, 0, 128),
+        'factory': (120, 120, 120),
+        'office': (255, 0, 0),
+        'shop': (0, 255, 255),
+        'park': (0, 255, 0)
+    }
+    tile_thresholds = {
+        'tavern': 0.80,
+        'civic': 0.60,
+        'factory': 0.80,
+        'office': 0.80,
+        'shop': 0.80,
+        'park': 0.80
+    }
+    
+    # Create found tiles image pyramid
+    found_tiles = oriented.copy()
+    tile_blur = ((5,5), 3)
+    gray_found_tiles = cv2.cvtColor(found_tiles, cv2.COLOR_BGR2GRAY)
+    found_tiles_pyramid = []
+    for scale in np.linspace(.8, 1.2, 20)[::-1]:
+        found_tiles_pyramid.append((scale, cv2.GaussianBlur(imutils.resize(gray_found_tiles, 
+                                                                           int(gray_found_tiles.shape[0] * scale)),
+                                                            ksize=tile_blur[0],
+                                                            sigmaX=tile_blur[1])))
         
-        # Get top left symbol. (Top left 1/3)
-        symbol = tile_image[int(tile_width/10):int(tile_width/2), int(tile_height/10):int(tile_height/2)]
+    
+    for tile_name in tile_searches.keys():
+        template_path = os.path.join(os.path.dirname(__file__), 'images', 'tile_images', f'{tile_name}.png')
+        template = cv2.imread(template_path)
+        template = cv2.GaussianBlur(cv2.cvtColor(template, cv2.COLOR_BGR2GRAY), ksize=tile_blur[0], sigmaX=tile_blur[1])
         
-        # Find max color
-        symbol_hsv = cv2.cvtColor(symbol, cv2.COLOR_BGR2HSV)
-        cv2.namedWindow('Trackbars')
-        def update(_):
-            h_min = cv2.getTrackbarPos('Hue Min', 'Trackbars')
-            h_max = cv2.getTrackbarPos('Hue Max', 'Trackbars')
-            s_min = cv2.getTrackbarPos('Sat Min', 'Trackbars')
-            s_max = cv2.getTrackbarPos('Sat Max', 'Trackbars')
-            v_min = cv2.getTrackbarPos('Val Max', 'Trackbars')
-            v_max = cv2.getTrackbarPos('Val Min', 'Trackbars')
-            lower = np.array([h_min, s_min, v_min])
-            upper = np.array([h_max, s_max, v_max])
-            filtered_symbol = cv2.inRange(symbol_hsv, lower, upper)
-            cv2.imshow("Filtered Symbol", filtered_symbol)
-        cv2.createTrackbar('Hue Min', 'Trackbars', 0, 255, update)
-        cv2.createTrackbar('Hue Max', 'Trackbars', 0, 255, update)
-        cv2.createTrackbar('Sat Min', 'Trackbars', 0, 255, update)
-        cv2.createTrackbar('Sat Max', 'Trackbars', 0, 255, update)
-        cv2.createTrackbar('Val Max', 'Trackbars', 0, 255, update)
-        cv2.createTrackbar('Val Min', 'Trackbars', 0, 255, update)
-        cv2.waitKey(0)
+        # We know the tile is about 1/5 the width/height of the city, and the template has no border so it's 85% the size of a tile.
+        template = imutils.resize(template, int((found_tiles.shape[0] + found_tiles.shape[1]) / 2 / 5 * 0.85)) # Just use the width for now. We don't want to distort the template.
+
+        candidates = []
+        for scale, level in found_tiles_pyramid:
+            res = cv2.matchTemplate(level, template, cv2.TM_CCOEFF_NORMED)
+            locs = np.where(res>=tile_thresholds[tile_name])
+            locs = np.column_stack([locs[1], locs[0]])
+            values = res[locs[:, 0], locs[:, 1]]
+            locations = np.clip((locs / scale).astype(int), [0, 0], [found_tiles.shape[0] - 1, found_tiles.shape[1] - 1]) # After dividing, is coordiates at 1.0 scale
+            candidates.extend(list(zip(locations.tolist(), values.tolist())))
+
+        boxes = []
+        marked = oriented.copy()
+        for location, value in candidates:
+            boxes.append(np.array([location,
+                                    [location[0], location[1] + template.shape[1]],
+                                    [location[0] + template.shape[0], location[1] + template.shape[1]],
+                                    [location[0] + template.shape[0], location[1]]]))
+            marked = cv2.drawMarker(marked, location, tile_colors[tile_name])
+        #cv2.imshow(tile_name + ' template', template)
+        #cv2.imshow(tile_name, found_tiles_pyramid[0][1])
+        #cv2.imshow(tile_name + 'marked', marked)
+        #cv2.waitKey(0)
+        #cv2.destroyAllWindows()
         
-            
-    for row in tile_images:
-        for tile in row:
-            classify_tile(tile)
+        
+        
+                
+                
+        found_tiles = cv2.drawContours(found_tiles, boxes, -1, tile_colors[tile_name])
+        
+        
+    
+    cv2.imshow("Tiles found", found_tiles)
+    cv2.waitKey(0)
 
            
     

@@ -2,8 +2,17 @@
 
 window.addEventListener("DOMContentLoaded", async () => {
 
+    // populateScore();
+
     // const scorebtn = document.getElementById("image-submit");
     // scorebtn.addEventListener("click", populateScore);
+
+    // const score = document.getElementById("score").value;
+    // const factoryCount = document.getElementById("factory-count").value;
+    // const cityTiles = document.getElementById("city-tiles").value;
+    // console.log(score);
+    // console.log(factoryCount);
+    // console.log(cityTiles);
 
     // District Collapsible Element
     const districts = document.getElementById("district-collapsible");
@@ -41,6 +50,34 @@ window.addEventListener("DOMContentLoaded", async () => {
 });
 
 function populateScore(){
+    const container = document.getElementById("page-container");
+
+    const score = parseInt(document.getElementById("score").value);
+    const factoryCount = parseInt(document.getElementById("factory-count").value);
+    const cityTiles = document.getElementById("city-tiles").value;
+    console.log(score);
+    console.log(factoryCount);
+    console.log(cityTiles);
+
+    // Hide image submit
+    if(score === 0){
+        console.log("score = 0");
+        const scoreArea = document.getElementById("score-area");
+        // scoreArea.style.display = "hidden";
+        container.removeChild(scoreArea);
+    } else {
+        console.log("score != 0");
+        const imageUploadArea = document.getElementById("image-upload");
+        imageUploadArea.style.display = "hidden";
+        const imageForm = document.getElementById("image-form");
+        imageForm.style.display = "hidden";
+
+        container.removeChild(imageUploadArea);
+
+        const factoryCount = document.getElementById("factory-count").value;
+        const cityTiles = document.getElementById("city-tiles").value;
+    }
+
     // fill the score area
     // add in district score
     // add in factory score
@@ -72,8 +109,8 @@ function makeTD(){
     }
     td_dropdown.addEventListener("change", () => {
         const tile = td_dropdown.value;
-        td_dropdown.style.backgroundColor = changeTile(tile);
-        console.log("tile")
+        td_dropdown.style.backgroundColor = "transparent";
+        td_dropdown.style.background = `/static/icons/${tile}_icon.png`;
     });
     td.appendChild(td_dropdown);
     return td;

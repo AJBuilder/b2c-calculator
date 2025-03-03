@@ -19,15 +19,22 @@ def get_index():
 # The route where the calculator app is located
 @app.route('/BetweenTwoCitiesCalculator')
 def get_calculator():
-    return render_template('index.html')
+
+    # Initial Default Values
+    score: int = 0
+    num_factories: int = 0
+    city_tiles: list[list[str]] = []
+
+    return render_template('index.html', score=score, num_factories=num_factories, city_tiles=city_tiles)
 
 # upload route for images
 # currently only saves the images in the uploads folder
 # TODO: Pass the images into the image processor and get the score back
-@app.route('/upload', methods=['POST'])
+@app.route('/CityScore', methods=['POST'])
 def upload_image():
     if 'image' not in request.files:
-        # TODO: flash error message
+        # TODO: flash no image message
+        print("HELLO")
         return redirect(url_for('get_calculator'))
 
     # Get the file
@@ -42,4 +49,16 @@ def upload_image():
         # then get back the score and pass it back to the front end
         file.save(file_path)  # Save the uploaded image to the uploads folder
 
-        return redirect(url_for('get_calculator'))
+        # TODO: assign these values to the proper values of the city
+        # TESTING VALUES
+        score = 50
+        num_factories = 4
+        city_tiles = [
+            ["factory","shop","park","tavern","office"],
+            ["factory","shop","park","park","house"],
+            ["tavern","shop","tavern","office","house"],
+            ["office","shop","office","tavern","office"],
+            ["factory","shop","park","office","house"]
+        ]
+
+    return render_template("index.html", score=score, num_factories=num_factories, city_tiles=city_tiles)

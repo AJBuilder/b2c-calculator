@@ -9,6 +9,11 @@
     <script src="{{ url_for('static', filename='scripts/index.js') }}"></script>
 </head>
 <body>
+
+    <input type="hidden" id="score", name="score" value="{{ score }}">
+    <input type="hidden" id="factory-count", name="factory-count" value="{{ num_factories }}">
+    <input type="hidden" id="city-tiles", name="city-tiles" value="{{ city_tiles }}">
+
     <div id="page-container">
 
         <div id="district-selection">
@@ -41,7 +46,7 @@
                 </div>
             </div>
         </div>
-        <div id="factory-score">
+        <div id="factory-scoring">
             <div class="factory-row">
                 <label class="label" for="factory-dropdown"> <h1>Factory Score:</h1> </label>
                 <select class="selection" name="factory-dropdown" id="factory-dropdown">
@@ -53,15 +58,52 @@
         </div>
 
         <div id="image-upload">
-            <form id="image-form" method="POST" enctype="multipart/form-data" action="/upload">
+            <form id="image-form" method="POST" enctype="multipart/form-data" action="/CityScore">
                 <label id="image-input-label" for="image-input">  </label>
                 <input id="image-input" type="file" name="image" accept="image/*" capture="environment" id="imageInput">
                 <button id="image-submit" type="submit">Score City</button>
             </form>
         </div>
 
-        <div id="city-board-container">
-            <table id="city-board-tiles"></table>
+        <div id="score-area">
+            <div id="total-score">
+                <h1> {{score}} </h1>
+            </div>
+            <div id="city-board-container">
+                <table id="city-board-tiles"></table>
+            </div>
+            <div id="score-breakdown">
+                <table id="score-breakdown-table">
+                    <tr>
+                        <td> <img src="/static/icons/shop_icon.png"> </td>
+                        <td id="shop-score"> 1 </td>
+                    </tr>
+                    <tr>
+                        <td> <img src="/static/icons/factory_icon.png"> </td>
+                        <td id="factory-score"> 2 </td>
+                    </tr>
+                    <tr>
+                        <td> <img src="/static/icons/park_icon.png"> </td>
+                        <td id="park-score"> 3 </td>
+                    </tr>
+                    <tr>
+                        <td> <img src="/static/icons/office_icon.png"> </td>
+                        <td id="office-score"> 4 </td>
+                    </tr>
+                    <tr>
+                        <td> <img src="/static/icons/tavern_icon.png"> </td>
+                        <td id="tavern-score"> 5 </td>
+                    </tr>
+                    <tr>
+                        <td> <img src="/static/icons/house_icon.png"> </td>
+                        <td id="house-score"> 6 </td>
+                    </tr>
+                    <tr>
+                        <td> <img src="/static/icons/civic_icon.png"> </td>
+                        <td id="civic-score"> 7 </td>
+                    </tr>
+                </table>
+            </div>
         </div>
 
         <div id="footer">

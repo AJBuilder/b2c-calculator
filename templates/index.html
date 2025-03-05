@@ -7,12 +7,14 @@
 
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/index.css') }}">
     <script src="{{ url_for('static', filename='scripts/index.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/score.js') }}"></script>
+
 </head>
 <body>
 
-    <input type="hidden" id="score", name="score" value="{{ score }}">
-    <input type="hidden" id="factory-count", name="factory-count" value="{{ num_factories }}">
+    <!-- City Tile Layout for JS -->
     <input type="hidden" id="city-tiles", name="city-tiles" value="{{ city_tiles }}">
+    <input type="hidden" id="scored", name="scored" value="{{ scored }}">
 
     <div id="page-container">
 
@@ -23,25 +25,25 @@
                 <div class="district-row">
                     <label class="label" for="district1-dropdown">District 1:</label>
                     <select class="selection" name="district1-dropdown" id="district1-dropdown">
-                        <option value="Other">0</option>
-                        <option value="First">9</option>
-                        <option value="Second">3</option>
+                        <option value="0">0</option>
+                        <option value="9">9</option>
+                        <option value="3">3</option>
                     </select>
                 </div>
                 <div class="district-row">
                     <label class="label" for="district2-dropdown">District 2:</label>
                     <select class="selection" name="district2-dropdown" id="district2-dropdown">
-                        <option value="Other">0</option>
-                        <option value="First">8</option>
-                        <option value="Second">4</option>
+                        <option value="0">0</option>
+                        <option value="8">8</option>
+                        <option value="4">4</option>
                     </select>
                 </div>
                 <div class="district-row">
                     <label class="label" for="district3-dropdown">District 3:</label>
                     <select class="selection" name="district3-dropdown" id="district3-dropdown">
-                        <option value="Other">0</option>
-                        <option value="First">7</option>
-                        <option value="Second">5</option>
+                        <option value="0">0</option>
+                        <option value="7">7</option>
+                        <option value="5">5</option>
                     </select>
                 </div>
             </div>
@@ -50,15 +52,15 @@
             <div class="factory-row">
                 <label class="label" for="factory-dropdown"> <h1>Factory Score:</h1> </label>
                 <select class="selection" name="factory-dropdown" id="factory-dropdown">
-                    <option value="Other">2</option>
-                    <option value="Second">3</option>
-                    <option value="First">4</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
                 </select>
             </div>
         </div>
 
         <div id="image-upload">
-            <form id="image-form" method="POST" enctype="multipart/form-data" action="/CityScore">
+            <form id="image-form" method="POST" enctype="multipart/form-data" action="/Score">
                 <label id="image-input-label" for="image-input">  </label>
                 <input id="image-input" type="file" name="image" accept="image/*" capture="environment" id="imageInput">
                 <button id="image-submit" type="submit">Score City</button>
@@ -66,8 +68,8 @@
         </div>
 
         <div id="score-area">
-            <div id="total-score">
-                <h1> {{score}} </h1>
+            <div>
+                <h1 id="total-score-heading">  </h1>
             </div>
             <div id="city-board-container">
                 <table id="city-board-tiles"></table>
@@ -75,32 +77,48 @@
             <div id="score-breakdown">
                 <table id="score-breakdown-table">
                     <tr>
-                        <td> <img src="/static/icons/shop_icon.png"> </td>
-                        <td id="shop-score"> 1 </td>
+                        <td>District 1:</td>
+                        <td id="district1-score"></td>
+                    </tr>
+                    <tr>
+                        <td>District 2:</td>
+                        <td id="district2-score"></td>
+                    </tr>
+                    <tr>
+                        <td>District 3:</td>
+                        <td id="district3-score"></td>
                     </tr>
                     <tr>
                         <td> <img src="/static/icons/factory_icon.png"> </td>
-                        <td id="factory-score"> 2 </td>
+                        <td id="factory-score">  </td>
+                    </tr>
+                    <tr>
+                        <td> <img src="/static/icons/shop_icon.png"> </td>
+                        <td id="shop-score">  </td>
                     </tr>
                     <tr>
                         <td> <img src="/static/icons/park_icon.png"> </td>
-                        <td id="park-score"> 3 </td>
-                    </tr>
-                    <tr>
-                        <td> <img src="/static/icons/office_icon.png"> </td>
-                        <td id="office-score"> 4 </td>
+                        <td id="park-score">  </td>
                     </tr>
                     <tr>
                         <td> <img src="/static/icons/tavern_icon.png"> </td>
-                        <td id="tavern-score"> 5 </td>
+                        <td id="tavern-score">  </td>
+                    </tr>
+                    <tr>
+                        <td> <img src="/static/icons/office_icon.png"> </td>
+                        <td id="office-score">  </td>
                     </tr>
                     <tr>
                         <td> <img src="/static/icons/house_icon.png"> </td>
-                        <td id="house-score"> 6 </td>
+                        <td id="house-score">  </td>
                     </tr>
                     <tr>
                         <td> <img src="/static/icons/civic_icon.png"> </td>
-                        <td id="civic-score"> 7 </td>
+                        <td id="civic-score">  </td>
+                    </tr>
+                    <tr>
+                        <td> Total: </td>
+                        <td id="total-score-box">  </td>
                     </tr>
                 </table>
             </div>

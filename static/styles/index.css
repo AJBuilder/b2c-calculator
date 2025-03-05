@@ -167,7 +167,8 @@
     justify-content: center; 
     width: 100vw;
     height: 100vw;
-    border-bottom: 1px solid #aaa;
+    padding: 0px;
+    margin: 0px;
 }
 
 #city-board-tiles {
@@ -202,14 +203,30 @@
 
 /* ------------------------------------------------------------------------------------------- */
 /* Score Breakdown Area */
+#score-breakdown {
+    padding-top: 0px;
+    margin: 0px;
+    height: 80%;
+    width: 90%;
+}
+
+#total-score-heading {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    padding-top: 5px;
+    margin-bottom: 0px;
+}
+
 #score-breakdown-table {
+    padding: 0px;
+    margin: 0px;
     width: 90vw;
     height: 130vw;
     font-size: 20px;
     display: flex;
     flex-direction: column; 
     align-items: center; 
-    justify-content: center; 
 }
 
 #score-breakdown-table {
@@ -219,9 +236,17 @@
 #score-breakdown-table tr {
     border-bottom: 1px solid #aaa;
 }
+#score-breakdown-table tr:last-child {
+    border-bottom: none;
+}
 
 #score-breakdown-table td {
     padding-left: 20px;
+    padding-top: 5px;
+}
+
+#total-score-box {
+    font-size: 25px;
 }
 
 /* ------------------------------------------------------------------------------------------- */
@@ -229,7 +254,8 @@
 /* ------------------------------------------------------------------------------------------- */
 /* Footer */
 #footer {
-    padding-top:10px;
+    margin-top: 40px;
+    padding-top: 40px;
     height: 40px;
     bottom: 0;
 }

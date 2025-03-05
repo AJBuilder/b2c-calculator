@@ -14,16 +14,16 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 });
 
-// TODO: WRITE SCORE FUNCTION AND HELPERS
+// TODO: WRITE SCORE FUNCTION HELPERS
 function scoreCity(){
     const cityTiles = JSON.parse(document.getElementById("city-tiles").value.replaceAll("\'", "\""));
     return {
-        "shop_score":scoreShops(cityTiles),
-        "park_score":scoreParks(cityTiles),
-        "tavern_score":scoreTaverns(cityTiles),
-        "office_score":scoreOffices(cityTiles),
-        "house_score":scoreHouses(cityTiles),
-        "civic_score":scoreCivics(cityTiles)
+        "shop_score": scoreShops(cityTiles),
+        "park_score": scoreParks(cityTiles),
+        "tavern_score": scoreTaverns(cityTiles),
+        "office_score": scoreOffices(cityTiles),
+        "house_score": scoreHouses(cityTiles),
+        "civic_score": scoreCivics(cityTiles)
     };
 }
 
@@ -45,16 +45,15 @@ function scoreHouses(cityTiles){
 function scoreCivics(cityTiles){
     return 0;
 }
-function countFactories(cityTiles){
+function countFactories(){
+    const cityTiles = JSON.parse(document.getElementById("city-tiles").value.replaceAll("\'", "\""));
     return 0;
 }
 
 // populates score changes through the frontend
 function populateScore(){
-
     const scores = scoreCity();
-    const cityTiles = JSON.parse(document.getElementById("city-tiles").value.replaceAll("\'", "\""));
-    const numFactories = countFactories(cityTiles);
+    const numFactories = countFactories();
 
     document.getElementById("district1-score").innerText = document.getElementById("district1-dropdown").value;
     document.getElementById("district2-score").innerText = document.getElementById("district2-dropdown").value;
@@ -97,6 +96,7 @@ function makeTR(){
     return tr;
 }
 
+// TODO: REWRITE THIS FUNCTION
 function makeTD(){
     const options = [
         "empty", 
@@ -120,9 +120,9 @@ function makeTD(){
         td_dropdown.appendChild(option);
     }
     td_dropdown.addEventListener("change", () => {
-        const tile = td_dropdown.value;
-        td_dropdown.style.backgroundColor = "transparent";
-        td_dropdown.style.background = `/static/icons/${tile}_icon.png`;
+        const tile = td_dropdown.value.split(" ")[0];
+        // td_dropdown.style.backgroundColor = "transparent";
+        td_dropdown.style.backgroundImage = `/static/icons/${tile}_icon.png`; //TODO: FIX THIS, IT DOESN'T WORK
         populateScore();
     });
     td.appendChild(td_dropdown);

@@ -113,7 +113,6 @@
     margin-top: 20px;
     height: 100%;
     width: 100%;
-    border-bottom: 1px solid #aaa;
 }
 #image-input {
     display: none;
@@ -150,11 +149,16 @@
     margin-bottom: 20px;
     padding: 10px 20px;
     font-size: 16px;
-    background-color: red;
+    background-color: gray;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    margin: 30px;
+    border-bottom: 1px solid #aaa;
+}
+#manual-mode {
+    margin: 40px;
 }
 /* ------------------------------------------------------------------------------------------- */
 
@@ -254,8 +258,8 @@
 /* ------------------------------------------------------------------------------------------- */
 /* Footer */
 #footer {
-    margin-top: 40px;
-    padding-top: 40px;
+    margin-top: 80px;
+    padding-top: 80px;
     height: 40px;
     bottom: 0;
 }

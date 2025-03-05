@@ -22,6 +22,7 @@ window.addEventListener("DOMContentLoaded", async () => {
                 imageLabel.style.height = "90vw"; // Resize the photo to be bigger than the camera icon was
                 imageLabel.style.width = "90vw";
                 imageLabel.innerHTML = `<img src="${e.target.result}" alt="Uploaded Image">`;
+                document.getElementById("image-submit").style.backgroundColor = "red";
             };
             reader.readAsDataURL(file);
         }

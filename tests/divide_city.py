@@ -3,7 +3,7 @@ import cv2
 import os
 import numpy as np
 import imutils
-import time
+from sklearn.cluster import DBSCAN
     
 
 
@@ -133,14 +133,15 @@ if __name__ == "__main__":
                                                             ksize=tile_blur[0],
                                                             sigmaX=tile_blur[1])))
         
-    
+    # We know the tile is about 1/5 the width/height of the city
+    tile_size = int((found_tiles.shape[0] + found_tiles.shape[1]) / 2 / 5)
     for tile_name in tile_searches.keys():
         template_path = os.path.join(os.path.dirname(__file__), 'images', 'tile_images', f'{tile_name}.png')
         template = cv2.imread(template_path)
         template = cv2.GaussianBlur(cv2.cvtColor(template, cv2.COLOR_BGR2GRAY), ksize=tile_blur[0], sigmaX=tile_blur[1])
         
-        # We know the tile is about 1/5 the width/height of the city, and the template has no border so it's 85% the size of a tile.
-        template = imutils.resize(template, int((found_tiles.shape[0] + found_tiles.shape[1]) / 2 / 5 * 0.85)) # Just use the width for now. We don't want to distort the template.
+        # The template has no border so it's 85% the size of a tile.
+        template = imutils.resize(template, int(tile_size * 0.85)) # Just use the width for now. We don't want to distort the template.
 
         candidates = []
         for scale, level in found_tiles_pyramid:
@@ -151,30 +152,30 @@ if __name__ == "__main__":
             locations = np.clip((locs / scale).astype(int), [0, 0], [found_tiles.shape[0] - 1, found_tiles.shape[1] - 1]) # After dividing, is coordiates at 1.0 scale
             candidates.extend(list(zip(locations.tolist(), values.tolist())))
 
+        # Cluster
+        clustered = DBSCAN(eps=tile_size/3).fit([c[0] for c in candidates])
+        identified_tiles = {}
+        for cluster, c in zip(clustered.labels_, candidates):
+            if cluster not in identified_tiles:
+                identified_tiles[cluster] = c
+            else:
+                if identified_tiles[cluster][1] < c[1]: # If we found one with higher score.
+                    identified_tiles[cluster] = c
+            
+
         boxes = []
-        marked = oriented.copy()
-        for location, value in candidates:
+        for location, value in identified_tiles.values():
             boxes.append(np.array([location,
-                                    [location[0], location[1] + template.shape[1]],
-                                    [location[0] + template.shape[0], location[1] + template.shape[1]],
-                                    [location[0] + template.shape[0], location[1]]]))
-            marked = cv2.drawMarker(marked, location, tile_colors[tile_name])
-        #cv2.imshow(tile_name + ' template', template)
-        #cv2.imshow(tile_name, found_tiles_pyramid[0][1])
-        #cv2.imshow(tile_name + 'marked', marked)
-        #cv2.waitKey(0)
-        #cv2.destroyAllWindows()
+                                  [location[0], location[1] + template.shape[1]],
+                                  [location[0] + template.shape[0], location[1] + template.shape[1]],
+                                  [location[0] + template.shape[0], location[1]]]))
         
-        
-        
-                
-                
         found_tiles = cv2.drawContours(found_tiles, boxes, -1, tile_colors[tile_name])
         
-        
-    
     cv2.imshow("Tiles found", found_tiles)
     cv2.waitKey(0)
+    
+    
 
            
     

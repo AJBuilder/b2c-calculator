@@ -135,6 +135,7 @@ if __name__ == "__main__":
         
     # We know the tile is about 1/5 the width/height of the city
     tile_size = int((found_tiles.shape[0] + found_tiles.shape[1]) / 2 / 5)
+    identified_tiles = []
     for tile_name in tile_searches.keys():
         template_path = os.path.join(os.path.dirname(__file__), 'images', 'tile_images', f'{tile_name}.png')
         template = cv2.imread(template_path)
@@ -154,23 +155,34 @@ if __name__ == "__main__":
 
         # Cluster
         clustered = DBSCAN(eps=tile_size/3).fit([c[0] for c in candidates])
-        identified_tiles = {}
-        for cluster, c in zip(clustered.labels_, candidates):
-            if cluster not in identified_tiles:
-                identified_tiles[cluster] = c
+        best_in_cluster = {}
+        for cluster_label, c in zip(clustered.labels_, candidates):
+            if cluster_label not in best_in_cluster:
+                best_in_cluster[cluster_label] = c
             else:
-                if identified_tiles[cluster][1] < c[1]: # If we found one with higher score.
-                    identified_tiles[cluster] = c
+                if best_in_cluster[cluster_label][1] < c[1]: # If we found one with higher score.
+                    best_in_cluster[cluster_label] = c
             
 
         boxes = []
-        for location, value in identified_tiles.values():
+        for location, value in best_in_cluster.values():
             boxes.append(np.array([location,
                                   [location[0], location[1] + template.shape[1]],
                                   [location[0] + template.shape[0], location[1] + template.shape[1]],
                                   [location[0] + template.shape[0], location[1]]]))
         
+        identified_tiles.extend([(loc, tile_name) for loc, _ in best_in_cluster.values()])
         found_tiles = cv2.drawContours(found_tiles, boxes, -1, tile_colors[tile_name])
+        
+    # Assemble grid
+    # We do this be clustering the x and y coordinates.
+    clustered_x = DBSCAN(eps=oriented.shape[0]/5 * 0.5, min_samples=3).fit([[t[0][0]] for t in identified_tiles])
+    clustered_y = DBSCAN(eps=oriented.shape[1]/5 * 0.5, min_samples=3).fit([[t[0][1]] for t in identified_tiles])
+    #grid = [[0 * 5] * 5]
+    #for x_label, y_label, tile in zip(clustered_x.labels_, clustered_y.labels_, identified_tiles):
+    #    if x_label >= 0 and x_label < 5 and y_label >= 0 and y_label < 5:
+    #        grid[x_label][y_label] = tile
+    
         
     cv2.imshow("Tiles found", found_tiles)
     cv2.waitKey(0)

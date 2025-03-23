@@ -42,7 +42,27 @@ function scoreOffices(cityTiles){
     return 0;
 }
 function scoreHouses(cityTiles){
-    return 0;
+    let houseList = ["factory", "shop", "park", "tavern", "office"];
+    let numScoringHouses = 0;
+    let numFactoryHouses = 0;
+    for(let i = 0; i < 5; i++){
+        for(let j = 0; j < 5; j++){
+            if(cityTiles[i][j] === "house"){
+                if(getNeighbors(i, j, cityTiles).includes("factory")){
+                    numFactoryHouses += 1; // factory adjacent houses
+                }else{
+                    numScoringHouses += 1; // good houses
+                }
+            }
+            if(tile.split(" ")[0] in houseList){
+                houseList.remove(tile.split(" ")[0]); // how much to score each house
+            }
+        }
+    }
+    if(houseList.length === 0){ // extremly unlikely, perhaps even impossible
+        return numHouses*1;
+    }
+    return ((numScoringHouses*houseList.length) + (numFactoryHouses));
 }
 function scoreCivics(cityTiles){
     return 0;

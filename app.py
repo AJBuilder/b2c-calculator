@@ -25,7 +25,7 @@ def get_calculator():
             ["factory", "shop", "park", "tavern inn", "office"],
             ["factory", "shop", "park", "office","house"],
             ["factory", "shop", "empty", "empty", "house"],
-            ["civc factory shop house", "shop", "empty", "empty", "vertical_bridge"],
+            ["civc factory shop house", "shop", "empty", "empty", "bridge vertical"],
             ["tavern music", "office", "tavern food", "tavern bar", "civic tavern house factory"]
         ]
         return render_template('index.html', city_tiles=city_tiles, scored=False)
@@ -37,11 +37,11 @@ def get_calculator():
             # TODO: this means manual score has been selected so pass an empty city to the template
             print('NO FILE') # Don't save a file that doesn't exist
             city_tiles: list[list[str]] = [
-                ["empty", "empty", "empty", "empty", "empty"],
-                ["empty", "empty", "empty", "empty", "empty"],
-                ["empty", "empty", "empty", "empty", "empty"],
-                ["empty", "empty", "empty", "empty", "empty"],
-                ["empty", "empty", "empty", "empty", "empty"]
+                ["factory", "shop", "park", "tavern inn", "office"],
+                ["factory", "shop", "park", "office","house"],
+                ["factory", "shop", "empty", "empty", "house"],
+                ["civic factory shop house", "shop", "empty", "empty", "bridge vertical"],
+                ["tavern music", "office", "tavern restaurant", "tavern bar", "civic tavern house factory"]
             ]
             return render_template("index.html", city_tiles=city_tiles, scored=True)
         else:
@@ -52,18 +52,18 @@ def get_calculator():
             file.save(file_path)
 
             # TODO: REPLACE WITH PROCESSOR OUTPUT
-            # city_tiles: list[list[str]] = [
-            #     ["factory", "shop", "park", "tavern inn", "office"],
-            #     ["factory", "shop", "park", "office","house"],
-            #     ["factory", "shop", "empty", "empty", "house"],
-            #     ["civc factory shop house", "shop", "empty", "empty", "bridge vertical"],
-            #     ["tavern music", "office", "tavern food", "tavern bar", "civic tavern house factory"]
-            # ]
             city_tiles: list[list[str]] = [
-                ["factory", "factory", "factory", "factory", "factory"],
-                ["factory", "factory", "factory", "factory", "factory"],
-                ["factory", "factory", "factory", "factory", "factory"],
-                ["factory", "factory", "factory", "factory", "factory"],
-                ["factory", "factory", "factory", "factory", "factory"]
+                ["factory", "shop", "park", "tavern inn", "office"],
+                ["factory", "shop", "park", "office","house"],
+                ["factory", "shop", "empty", "empty", "house"],
+                ["civic factory shop house", "shop", "empty", "empty", "bridge vertical"],
+                ["tavern music", "office", "tavern restaurant", "tavern bar", "civic tavern house factory"]
             ]
+            # city_tiles: list[list[str]] = [
+            #     ["factory", "factory", "factory", "factory", "factory"],
+            #     ["factory", "factory", "factory", "factory", "factory"],
+            #     ["factory", "factory", "factory", "factory", "factory"],
+            #     ["factory", "factory", "factory", "factory", "factory"],
+            #     ["factory", "factory", "factory", "factory", "factory"]
+            # ]
             return render_template("index.html", city_tiles=city_tiles, scored=True)

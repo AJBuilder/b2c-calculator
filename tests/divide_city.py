@@ -163,7 +163,9 @@ if __name__ == "__main__":
                 if best_in_cluster[cluster_label][1] < c[1]: # If we found one with higher score.
                     best_in_cluster[cluster_label] = c
             
+        identified_tiles.extend([(loc, tile_name) for loc, _ in best_in_cluster.values()])
 
+        # Draw some boxes
         boxes = []
         for location, value in best_in_cluster.values():
             boxes.append(np.array([location,
@@ -171,19 +173,24 @@ if __name__ == "__main__":
                                   [location[0] + template.shape[0], location[1] + template.shape[1]],
                                   [location[0] + template.shape[0], location[1]]]))
         
-        identified_tiles.extend([(loc, tile_name) for loc, _ in best_in_cluster.values()])
         found_tiles = cv2.drawContours(found_tiles, boxes, -1, tile_colors[tile_name])
         
     # Assemble grid
-    # We do this be clustering the x and y coordinates.
-    clustered_x = DBSCAN(eps=oriented.shape[0]/5 * 0.5, min_samples=3).fit([[t[0][0]] for t in identified_tiles])
-    clustered_y = DBSCAN(eps=oriented.shape[1]/5 * 0.5, min_samples=3).fit([[t[0][1]] for t in identified_tiles])
-    #grid = [[0 * 5] * 5]
-    #for x_label, y_label, tile in zip(clustered_x.labels_, clustered_y.labels_, identified_tiles):
-    #    if x_label >= 0 and x_label < 5 and y_label >= 0 and y_label < 5:
-    #        grid[x_label][y_label] = tile
+    # We do this by imposing a grid on the found tiles.
+    # Step 1. Get bounding box of grid
+    locations = np.asarray([loc for loc, _ in identified_tiles])
+    min_x, min_y = np.min(locations, axis=0)
+    max_x, max_y = np.max(locations, axis=0)
     
-        
+    # Step 2. Find the "indices" of each tile in this grid. (Grid isn't necessarily 5x5!)
+    tile_indices = np.floor((locations - [min_x, min_y]) / tile_size).astype(int).tolist()
+    
+    # Step 3. Assemble a grid
+    grid = {}
+    for idx, tile_name in zip(map(tuple, tile_indices), [tile_name for _, tile_name in identified_tiles]):
+        grid[idx] = tile_name
+    print(grid)
+    
     cv2.imshow("Tiles found", found_tiles)
     cv2.waitKey(0)
     

@@ -42,21 +42,47 @@ function scoreOffices(cityTiles){
     return 0;
 }
 function scoreHouses(cityTiles){
-    return 0;
+    let houseList = ["factory", "shop", "park", "tavern", "office"];
+    let numScoringHouses = 0;
+    let numFactoryHouses = 0;
+    for(let i = 0; i < 5; i++){
+        for(let j = 0; j < 5; j++){
+            if(cityTiles[i][j] === "house"){
+                if(getNeighbors(i, j, cityTiles).includes("factory")){
+                    numFactoryHouses += 1; // factory adjacent houses
+                }else{
+                    numScoringHouses += 1; // good houses
+                }
+            }
+            if(tile.split(" ")[0] in houseList){
+                houseList.remove(tile.split(" ")[0]); // how much to score each house
+            }
+        }
+    }
+    if(houseList.length === 0){ // extremly unlikely, perhaps even impossible
+        return numHouses*1;
+    }
+    return ((numScoringHouses*houseList.length) + (numFactoryHouses));
 }
 function scoreCivics(cityTiles){
     return 0;
 }
 function scoreFactories(cityTiles){
-    return 0;
+    const factoryValue = Number(document.getElementById("factory-dropdown").value);
+    let numFactories = 0;
+    for(tileRow of cityTiles){
+        for(tile of tileRow){
+            if(tile === "factory"){
+                numFactories += 1;
+            }
+        }
+    }
+    return factoryValue * numFactories;
 }
 
 // populates score changes through the frontend
 function populateScore(){
     const cityTiles = getCityTiles();
-
-    console.log(cityTiles);
-
     const scores = scoreCity(cityTiles);
 
     document.getElementById("district1-score").innerText = document.getElementById("district1-dropdown").value;
@@ -137,7 +163,7 @@ function makeTD(cityTile){
     td_dropdown.value = cityTile.split(" ")[0]; // fill selected option
     td.appendChild(td_dropdown); // attach dropdown to table cell
     
-    fillIcon(td_dropdown.value, td); // fill table cell icon
+    fillIcon(cityTile, td); // fill table cell icon
 
     // Change the tile when the dropdown is changed
     td_dropdown.addEventListener("change", () => {
@@ -157,15 +183,15 @@ function makeTD(cityTile){
 
         //TODO: if tileType is tavern, civic, empty/landscape, bridge change the overlay images
         if(tileType === "tavern"){
-            // TODO: figure out tavern type
+            // TODO: figure out tavern type via tavern modal
             // TODO: overlay proper tavern icon
             firstChildHiddenID.value = `${tileType}`; // update the hidden field
         } else if(tileType === "civic"){
-            // TODO: figure out civic type
+            // TODO: figure out civic type via civic modal
             // TODO: overlay civic bonuses
             firstChildHiddenID.value = `${tileType}`; // update the hidden field
         } else if(tileType === "bridge"){
-            // TODO: figure out bridge direction
+            // TODO: figure out bridge direction via bridge modal
             // TODO: get correct img
             firstChildHiddenID.value = `${tileType}`; // update the hidden field
         } else {
@@ -180,13 +206,37 @@ function makeTD(cityTile){
 function fillIcon(tile, td){
     tile = tile.split(" ");
     if(tile[0] === "tavern"){
-
+        const baseImg = document.createElement("img");
+        baseImg.src = `/static/icons/${tile[0]}_icon.png`;
+        td.appendChild(baseImg);
+        const overlayImg1 = document.createElement("img");
+        overlayImg1.classList.add("ImgOverlay");
+        overlayImg1.classList.add(`img-${tile[1]}`);
+        overlayImg1.src = `/static/icons/tavern_${tile[1]}_icon.png`;
+        td.appendChild(overlayImg1);
     } else if(tile[0] === "civic"){
-
+        const baseImg = document.createElement("img");
+        baseImg.src = `/static/icons/${tile[0]}_icon.png`;
+        td.appendChild(baseImg);
+        // const overlayImg1 = document.createElement("img");
+        // overlayImg1.src = `/static/icons/${tile[1]}_icon.png`;
+        // overlayImg1.classList.add("ImgOverlay");
+        // overlayImg1.classList.add("ImgOverlay1");
+        // td.appendChild(overlayImg1);
+        // const overlayImg2 = document.createElement("img");
+        // overlayImg2.src = `/static/icons/${tile[2]}_icon.png`;
+        // overlayImg2.classList.add("ImgOverlay");
+        // overlayImg2.classList.add("ImgOverlay2");
+        // td.appendChild(overlayImg2);
+        // const overlayImg3 = document.createElement("img");
+        // overlayImg3.src = `/static/icons/${tile[3]}_icon.png`;
+        // overlayImg3.classList.add("ImgOverlay");
+        // overlayImg3.classList.add("ImgOverlay3");
+        // td.appendChild(overlayImg3);
     } else {
-        const img = document.createElement("img");
-        img.src = `/static/icons/${tile[0]}_icon.png`;
-        td.appendChild(img);
+        const baseImg = document.createElement("img");
+        baseImg.src = `/static/icons/${tile[0]}_icon.png`;
+        td.appendChild(baseImg);
     }
 }
 
@@ -203,4 +253,38 @@ function getCityTiles(){
         cityTiles.push(tr);
     }
     return cityTiles;
+}
+
+// Gets the neighbors of the tile specified at [row, col]
+function getNeighbors(row, col, cityTiles){
+    let neighbors = [];
+    if(row-1 >= 0){
+        if(cityTiles[row-1][col] === "bridge vertical"){
+            neighbors.push(cityTiles[row-2][col].split(" ")[0]);
+        }else{
+            neighbors.push(cityTiles[row-1][col].split(" ")[0]);
+        }
+    }
+    if(row+1 <= 4){
+        if(cityTiles[row+1][col] === "bridge vertical"){
+            neighbors.push(cityTiles[row+2][col].split(" ")[0]);
+        }else{
+            neighbors.push(cityTiles[row+1][col].split(" ")[0]);
+        }    
+    }
+    if(col-1 >= 0){
+        if(cityTiles[row][col-1] === "bridge horizontal"){
+            neighbors.push(cityTiles[row][col-2].split(" ")[0]);
+        }else{
+            neighbors.push(cityTiles[row][col-1].split(" ")[0]);
+        }    
+    }
+    if(col+1 <= 4){
+        if(cityTiles[row][col+1] === "bridge horizontal"){
+            neighbors.push(cityTiles[row][col+2].split(" ")[0]);
+        }else{
+            neighbors.push(cityTiles[row][col+1].split(" ")[0]);
+        }    
+    }
+    return neighbors;
 }

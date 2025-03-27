@@ -201,6 +201,7 @@
     margin-bottom: 0px;
     padding-top: 0px;
     padding-bottom: 0px;
+    z-index: 1;
 }
 
 #city-board-tiles select {
@@ -216,6 +217,46 @@
     cursor: pointer; 
     z-index: 5;
     transform: translate(0%, -10%);
+}
+
+.ImgOverlay {
+    position: absolute;
+    z-index: 2;
+}
+.img-bar {
+    height: 45%;
+    width: 45%;
+    transform: translate(65%, -135%);
+}
+.img-music {
+    height: 85%;
+    width: 85%;
+    transform: translate(10%, -95%);
+}
+.img-restaurant {
+    height: 60%;
+    width: 60%;
+    transform: translate(30%, -120%);
+}
+.img-inn {
+    height: 50%;
+    width: 50%;
+    transform: translate(50%, -130%);
+}
+.imgOverlay1 {
+    height: 5px;
+    width: 5px;
+    transform: translate(0%, -0%);
+}
+.imgOverlay2 {
+    height: 5px;
+    width: 5px;
+    transform: translate(0%, -0%);
+}
+.imgOverlay3 {
+    height: 5px;
+    width: 5px;
+    transform: translate(0%, -0%);
 }
 /* ------------------------------------------------------------------------------------------- */
 
@@ -268,6 +309,35 @@
 }
 
 /* ------------------------------------------------------------------------------------------- */
+/* Modals */
+#tavern-modal {
+    display: none;
+    position: fixed;
+    width: 80vw;
+    height: 60vw;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 20px;
+    border: 1px solid gray;
+    z-index: 10;
+    text-align: center;
+    margin: auto;
+}
+
+#tavern-selection {
+    position: absolute;
+    text-align: center;
+    font-size: 30px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.tavern-select-img {
+    transform: translate(10%, 30%);
+}
 
 /* ------------------------------------------------------------------------------------------- */
 /* Footer */

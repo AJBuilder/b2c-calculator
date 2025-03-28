@@ -94,17 +94,7 @@ if __name__ == "__main__":
     oriented = cv2.warpPerspective(image, M, (width, height))
     #cv2.imshow("Oriented", oriented)
     
-    
-    
-    ###### Find tile centers ######
-    tile_searches = {
-        'tavern': [],
-        'civic': [],
-        'factory': [],
-        'office': [],
-        'shop': [],
-        'park': []
-    }
+    ###### Find tiles ######
     tile_colors = {
         'tavern': (0, 0, 255),
         'civic': (255, 0, 128),
@@ -136,7 +126,7 @@ if __name__ == "__main__":
     # We know the tile is about 1/5 the width/height of the city
     tile_size = int((found_tiles.shape[0] + found_tiles.shape[1]) / 2 / 5)
     identified_tiles = []
-    for tile_name in tile_searches.keys():
+    for tile_name in tile_colors.keys():
         template_path = os.path.join(os.path.dirname(__file__), 'images', 'tile_images', f'{tile_name}.png')
         template = cv2.imread(template_path)
         template = cv2.GaussianBlur(cv2.cvtColor(template, cv2.COLOR_BGR2GRAY), ksize=tile_blur[0], sigmaX=tile_blur[1])
@@ -174,8 +164,72 @@ if __name__ == "__main__":
                                   [location[0] + template.shape[0], location[1]]]))
         
         found_tiles = cv2.drawContours(found_tiles, boxes, -1, tile_colors[tile_name])
+    
+    ###### Match landscape ######
+    # The landscapes are 3x3, so they are 3/5 the size of the city.
+    landscape_size = int((found_tiles.shape[0] + found_tiles.shape[1]) / 2 * 3 / 5)
+    landscape_tiles = {
+        'canyon': {
+            'landscape': [(1,0), (1,2), (0,2), (2,2)],
+            'horizontal_bridge': [(1,1)]
+        },
+        'flowers': {
+            'landscape': [(1,0), (2,0), (1,2), (2,2)],
+            'horizontal_bridge': [(1,1)]
+        },
+        'island': {
+            'landscape': [(1,0), (1,1)],
+            'horizontal_bridge': [(1,2)],
+            'vertical_bridge': [(0,1), (2,1)]
+        },
+        'lake': {
+            'landscape': [(2,0), (1,1), (2,1)],
+            'horizontal_bridge': [(1,2)],
+            'vertical_bridge': [(0,1)]
+        },
+        'marsh': {
+            'landscape': [(1,0), (2,0), (0,2), (1,2)],
+            'horizontal_bridge': [(1,1)]
+        },
+        'mountains': {
+            'landscape': [(2,0), (2,1), (0,2), (2,2)],
+            'vertical_bridge': [(1,1)]
+        },
+        'waterfall': {
+            'landscape': [(0,0), (1,0), (0,1), (1,1)],
+            'vertical_bridge': [(2,1)]
+        },
+    }
+    identified_landscape = None
+    for land_name, land_tiles in landscape_tiles.items():
+        # Load template image with alpha channel
+        template_path = os.path.join(os.path.dirname(__file__), 'images', 'landscapes', f'{land_name}.png')
+        template = cv2.imread(template_path, cv2.IMREAD_UNCHANGED)
+        template = imutils.resize(template, landscape_size) # Just use the width for now. We don't want to distort the template.
+
+        # Split channels
+        alpha_channel = template[:, :, 3]   # Extract alpha channel
+        template = template[:, :, :3]  # Extract BGR channels
+        #template = cv2.GaussianBlur(cv2.cvtColor(bgr_template, cv2.COLOR_BGR2GRAY), ksize=tile_blur[0], sigmaX=tile_blur[1])
+
+        # Create a mask from the alpha channel (non-zero means consider in matching)
+        mask = cv2.threshold(alpha_channel, 1, 255, cv2.THRESH_BINARY)[1]
+
+        # Perform template matching using the mask
+        result = cv2.matchTemplate(found_tiles, template, cv2.TM_CCOEFF_NORMED, mask=mask)
+
+        # Get the best match location
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+            
+        if max_val > 0.4:
+            identified_landscape = land_name
+            found_tiles = cv2.drawMarker(found_tiles, max_loc, (255,255,0))
+            for tile_type, locations in land_tiles.items():
+                identified_tiles.extend([((relative_loc[0] * tile_size + max_loc[0], relative_loc[1] * tile_size + max_loc[1]), tile_type) for relative_loc in locations])
+            break
         
-    # Assemble grid
+        
+    ###### Assemble grid ######
     # We do this by imposing a grid on the found tiles.
     # Step 1. Get bounding box of grid
     locations = np.asarray([loc for loc, _ in identified_tiles])
@@ -183,7 +237,7 @@ if __name__ == "__main__":
     max_x, max_y = np.max(locations, axis=0)
     
     # Step 2. Find the "indices" of each tile in this grid. (Grid isn't necessarily 5x5!)
-    tile_indices = np.floor((locations - [min_x, min_y]) / tile_size).astype(int).tolist()
+    tile_indices = np.floor((locations + (tile_size / 2) - [min_x, min_y]) / tile_size).astype(int).tolist()
     
     # Step 3. Assemble a grid
     grid = {}

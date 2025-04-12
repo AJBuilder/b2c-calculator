@@ -4,7 +4,7 @@ import os
 import numpy as np
 import imutils
 from sklearn.cluster import DBSCAN
-    
+from itertools import repeat
 
 
 if __name__ == "__main__":
@@ -117,57 +117,41 @@ if __name__ == "__main__":
     tile_blur = ((5,5), 3)
     gray_found_tiles = cv2.cvtColor(found_tiles, cv2.COLOR_BGR2GRAY)
     found_tiles_pyramid = []
+    blurred_found_tiles_pyramid = []
     for scale in np.linspace(.8, 1.2, 20)[::-1]:
-        found_tiles_pyramid.append((scale, cv2.GaussianBlur(imutils.resize(gray_found_tiles, 
-                                                                           int(gray_found_tiles.shape[0] * scale)),
-                                                            ksize=tile_blur[0],
-                                                            sigmaX=tile_blur[1])))
+        found_tiles_pyramid.append((scale, imutils.resize(found_tiles, int(found_tiles.shape[0] * scale))))
+        blurred_found_tiles_pyramid.append((scale, cv2.GaussianBlur(found_tiles_pyramid[-1][1],
+                                                                    ksize=tile_blur[0],
+                                                                    sigmaX=tile_blur[1])))
+        
         
     # We know the tile is about 1/5 the width/height of the city
     tile_size = int((found_tiles.shape[0] + found_tiles.shape[1]) / 2 / 5)
-    identified_tiles = []
+    tile_candidates = []
+    tile_template_size = int(tile_size * 0.85) # The template has no border so it's 85% the size of a tile.
     for tile_name in tile_colors.keys():
         template_path = os.path.join(os.path.dirname(__file__), 'images', 'tile_images', f'{tile_name}.png')
         template = cv2.imread(template_path)
-        template = cv2.GaussianBlur(cv2.cvtColor(template, cv2.COLOR_BGR2GRAY), ksize=tile_blur[0], sigmaX=tile_blur[1])
+        template = cv2.GaussianBlur(template, ksize=tile_blur[0], sigmaX=tile_blur[1])
+        #template = cv2.GaussianBlur(cv2.cvtColor(template, cv2.COLOR_BGR2GRAY), ksize=tile_blur[0], sigmaX=tile_blur[1])
         
-        # The template has no border so it's 85% the size of a tile.
-        template = imutils.resize(template, int(tile_size * 0.85)) # Just use the width for now. We don't want to distort the template.
+        template = imutils.resize(template, tile_template_size) # Just use the width for now. We don't want to distort the template.
 
-        candidates = []
-        for scale, level in found_tiles_pyramid:
+        for scale, level in blurred_found_tiles_pyramid:
             res = cv2.matchTemplate(level, template, cv2.TM_CCOEFF_NORMED)
             locs = np.where(res>=tile_thresholds[tile_name])
             locs = np.column_stack([locs[1], locs[0]])
             values = res[locs[:, 0], locs[:, 1]]
-            locations = np.clip((locs / scale).astype(int), [0, 0], [found_tiles.shape[0] - 1, found_tiles.shape[1] - 1]) # After dividing, is coordiates at 1.0 scale
-            candidates.extend(list(zip(locations.tolist(), values.tolist())))
+            # After dividing, is coordiates at 1.0 scale. Add half the size to convert to tile center.
+            locations = np.clip(((locs / scale) + (tile_template_size / 2)).astype(int), [0, 0], [found_tiles.shape[0] - 1, found_tiles.shape[1] - 1])
+            tile_candidates.extend(list(zip(locations.tolist(), values.tolist(), repeat(tile_name))))
 
-        # Cluster
-        clustered = DBSCAN(eps=tile_size/3).fit([c[0] for c in candidates])
-        best_in_cluster = {}
-        for cluster_label, c in zip(clustered.labels_, candidates):
-            if cluster_label not in best_in_cluster:
-                best_in_cluster[cluster_label] = c
-            else:
-                if best_in_cluster[cluster_label][1] < c[1]: # If we found one with higher score.
-                    best_in_cluster[cluster_label] = c
-            
-        identified_tiles.extend([(loc, tile_name) for loc, _ in best_in_cluster.values()])
 
-        # Draw some boxes
-        boxes = []
-        for location, value in best_in_cluster.values():
-            boxes.append(np.array([location,
-                                  [location[0], location[1] + template.shape[1]],
-                                  [location[0] + template.shape[0], location[1] + template.shape[1]],
-                                  [location[0] + template.shape[0], location[1]]]))
-        
-        found_tiles = cv2.drawContours(found_tiles, boxes, -1, tile_colors[tile_name])
     
     ###### Match landscape ######
     # The landscapes are 3x3, so they are 3/5 the size of the city.
     landscape_size = int((found_tiles.shape[0] + found_tiles.shape[1]) / 2 * 3 / 5)
+    # A mapping of the relative position of each "tile" of a landscape to the top-left origin.
     landscape_tiles = {
         'canyon': {
             'landscape': [(1,0), (1,2), (0,2), (2,2)],
@@ -224,29 +208,90 @@ if __name__ == "__main__":
         if max_val > 0.4:
             identified_landscape = land_name
             found_tiles = cv2.drawMarker(found_tiles, max_loc, (255,255,0))
-            for tile_type, locations in land_tiles.items():
-                identified_tiles.extend([((relative_loc[0] * tile_size + max_loc[0], relative_loc[1] * tile_size + max_loc[1]), tile_type) for relative_loc in locations])
+            for name, locations in land_tiles.items():
+                # Using the relative positions of each tile in relation to the landscape origin,
+                # find the center of each landscape tile.
+                tile_candidates.extend([((int(((relative_loc[0] * tile_size) + (tile_size / 2)) + max_loc[0]), int((relative_loc[1] * tile_size) + (tile_size / 2)) + max_loc[1]), max_val, name) for relative_loc in locations])
             break
         
+    
+    # Cluster
+    clustered = DBSCAN(eps=tile_size/3, min_samples=1).fit([loc for loc, _, _ in tile_candidates])
+    best_in_cluster = {}
+    for cluster_label, c in zip(clustered.labels_, tile_candidates):
+        if cluster_label not in best_in_cluster:
+            best_in_cluster[cluster_label] = c
+        else:
+            if best_in_cluster[cluster_label][1] < c[1]: # If we found one with higher score.
+                best_in_cluster[cluster_label] = c
+    identified_tiles = [(loc, name) for loc, _, name in best_in_cluster.values()]
+        
+    ###### Draw some boxes ######
+    for location, name in identified_tiles:
+        half_tile_template_size = int(tile_template_size / 2)
+        box = np.array([[location[0] - half_tile_template_size, location[1] - half_tile_template_size],
+                        [location[0] - half_tile_template_size, location[1] + half_tile_template_size],
+                        [location[0] + half_tile_template_size, location[1] + half_tile_template_size],
+                        [location[0] + half_tile_template_size, location[1] - half_tile_template_size]])
+        found_tiles = cv2.drawContours(found_tiles, [box], -1, tile_colors[name] if name in tile_colors else (255,255,255))
+    
         
     ###### Assemble grid ######
     # We do this by imposing a grid on the found tiles.
-    # Step 1. Get bounding box of grid
+    # Step 1. Get origin of the grid.
     locations = np.asarray([loc for loc, _ in identified_tiles])
-    min_x, min_y = np.min(locations, axis=0)
-    max_x, max_y = np.max(locations, axis=0)
+    grid_origin = np.min(locations, axis=0) - int(tile_size / 2)
     
     # Step 2. Find the "indices" of each tile in this grid. (Grid isn't necessarily 5x5!)
-    tile_indices = np.floor((locations + (tile_size / 2) - [min_x, min_y]) / tile_size).astype(int).tolist()
+    # i.e. How many multiples of the tile size the location is away from the grid origin.
+    tile_indices = np.floor((locations - grid_origin) / tile_size).astype(int).tolist()
     
     # Step 3. Assemble a grid
     grid = {}
     for idx, tile_name in zip(map(tuple, tile_indices), [tile_name for _, tile_name in identified_tiles]):
         grid[idx] = tile_name
-    print(grid)
     
     cv2.imshow("Tiles found", found_tiles)
-    cv2.waitKey(0)
+    
+    ##### Identify specific tavern ####
+    for loc, name in grid.items():
+        if name != 'tavern':
+            continue
+        
+        tile_pyramid = []
+        for scale, image in found_tiles_pyramid:
+            scaled_tile_size = int(tile_size * scale)
+            scaled_tile_size_half = int(scaled_tile_size / 2)
+            scaled_loc = (int(loc[0] * scaled_tile_size + scaled_tile_size_half), int(loc[1] * scaled_tile_size + scaled_tile_size_half))
+            tile = image[max(0, scaled_loc[1] - scaled_tile_size_half) : min(image.shape[1], scaled_loc[1] + scaled_tile_size_half),
+                         max(0, scaled_loc[0] - scaled_tile_size_half) : min(image.shape[0], scaled_loc[0] + scaled_tile_size_half)]
+            tile_pyramid.append((scale, tile))
+            
+        type_results = {}
+        crop_start = int(tile_template_size * .09)
+        crop_end = int(crop_start + tile_template_size*.25)
+        for tavern_type in ['bed', 'food', 'drink', 'music']:
+            template_path = os.path.join(os.path.dirname(__file__), 'images', 'tile_images', 'taverns', f'tavern-{tavern_type}.png')
+            template = cv2.imread(template_path)
+            template = imutils.resize(template, tile_template_size)
+            template = template[crop_start : crop_end, crop_start : crop_end]
+            best = 0
+            for scale, image in tile_pyramid:
+                res = cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
+                _, max_val, _, _ = cv2.minMaxLoc(res)
+                if max_val > best:
+                    best = max_val
+            type_results[tavern_type] = best
+        best_type = max(type_results, key=type_results.get)
+        grid[loc] = best_type
+        
+        
+            
+print(grid)
+cv2.waitKey(0)
+                
+                
+            
     
     
 

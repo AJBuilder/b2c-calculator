@@ -95,9 +95,31 @@ if __name__ == "__main__":
     #cv2.imshow("Oriented", oriented)
     
     ###### Find tiles ######
+    civic_types = [
+        "armory",
+        "bank",
+        "carriagehouse",
+        "cemetary",
+        "cityhall",
+        "college",
+        "courthouse",
+        "elementaryschool",
+        "firestation",
+        "highschool",
+        "hospital",
+        "library",
+        "marketsquare",
+        "middleschool",
+        "monument",
+        "museum",
+        "policestation",
+        "postoffice",
+        "sportsfield",
+        "treasury",
+        "watertower"
+    ]
     tile_colors = {
         'tavern': (0, 0, 255),
-        'civic': (255, 0, 128),
         'factory': (120, 120, 120),
         'office': (255, 0, 0),
         'shop': (0, 255, 255),
@@ -105,12 +127,14 @@ if __name__ == "__main__":
     }
     tile_thresholds = {
         'tavern': 0.80,
-        'civic': 0.60,
         'factory': 0.80,
         'office': 0.80,
         'shop': 0.80,
-        'park': 0.80
+        'park': 0.80,
     }
+    for c in civic_types:
+        tile_colors[f'civic-{c}'] = (255, 0, 128)
+        tile_thresholds[f'civic-{c}'] = 0.60
     
     # Create found tiles image pyramid
     found_tiles = oriented.copy()
@@ -130,10 +154,12 @@ if __name__ == "__main__":
     tile_candidates = []
     tile_template_size = int(tile_size * 0.85) # The template has no border so it's 85% the size of a tile.
     for tile_name in tile_colors.keys():
-        template_path = os.path.join(os.path.dirname(__file__), 'images', 'tile_images', f'{tile_name}.png')
+        if 'civic' in tile_name:
+            template_path = os.path.join(os.path.dirname(__file__), 'images', 'tile_images', 'civics', f'{tile_name}.png')
+        else:
+            template_path = os.path.join(os.path.dirname(__file__), 'images', 'tile_images', f'{tile_name}.png')
         template = cv2.imread(template_path)
         template = cv2.GaussianBlur(template, ksize=tile_blur[0], sigmaX=tile_blur[1])
-        #template = cv2.GaussianBlur(cv2.cvtColor(template, cv2.COLOR_BGR2GRAY), ksize=tile_blur[0], sigmaX=tile_blur[1])
         
         template = imutils.resize(template, tile_template_size) # Just use the width for now. We don't want to distort the template.
 
@@ -251,7 +277,6 @@ if __name__ == "__main__":
     for idx, tile_name in zip(map(tuple, tile_indices), [tile_name for _, tile_name in identified_tiles]):
         grid[idx] = tile_name
     
-    cv2.imshow("Tiles found", found_tiles)
     
     ##### Identify specific tavern ####
     for loc, name in grid.items():
@@ -284,16 +309,11 @@ if __name__ == "__main__":
             type_results[tavern_type] = best
         best_type = max(type_results, key=type_results.get)
         grid[loc] = best_type
-        
-        
-            
-print(grid)
-cv2.waitKey(0)
-                
                 
             
     
     
 
-           
-    
+    cv2.imshow("Tiles found", found_tiles)
+    print(grid)
+    cv2.waitKey(0)

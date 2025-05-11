@@ -189,59 +189,54 @@
     aspect-ratio: 1 / 1;
     width: 10%;
     text-align: center;
+    justify-content: center;
     border: 1px solid #ddd; 
     position: relative;
 }
 
-#city-board-tiles td img {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 0px;
-    margin-bottom: 0px;
-    padding-top: 0px;
-    padding-bottom: 0px;
+.baseImg {
     z-index: 1;
 }
 
 #city-board-tiles select {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
     position: absolute;
-    width: 100%;          
-    height: 100%;     
+    width: 85%;          
+    height: 85%;     
     font-size: 0px;       
     border-radius: 0px;   
     background-color: transparent; 
+    border-color: transparent;
     cursor: pointer; 
     z-index: 5;
-    transform: translate(0%, -10%);
+    transform: translate(0%, -5%);
+    padding: 0px;
+    margin: 0px;
 }
 
 .ImgOverlay {
     position: absolute;
     z-index: 2;
+    transform: translate(-100%, 0%);
 }
 .img-bar {
     height: 45%;
     width: 45%;
-    transform: translate(65%, -135%);
+    /* transform: translate(65%, -135%); */
 }
 .img-music {
     height: 85%;
     width: 85%;
-    transform: translate(10%, -95%);
+    /* transform: translate(10%, -95%); */
 }
 .img-restaurant {
     height: 60%;
     width: 60%;
-    transform: translate(30%, -120%);
+    /* transform: translate(30%, -120%); */
 }
 .img-inn {
     height: 50%;
     width: 50%;
-    transform: translate(50%, -130%);
+    /* transform: translate(50%, -130%); */
 }
 .imgOverlay1 {
     height: 5px;

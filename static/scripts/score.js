@@ -208,6 +208,7 @@ function fillIcon(tile, td){
     if(tile[0] === "tavern"){
         const baseImg = document.createElement("img");
         baseImg.src = `/static/icons/${tile[0]}_icon.png`;
+        baseImg.classList.add('baseImg');
         td.appendChild(baseImg);
         const overlayImg1 = document.createElement("img");
         overlayImg1.classList.add("ImgOverlay");

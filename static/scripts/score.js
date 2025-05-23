@@ -196,7 +196,7 @@ function makeTD(cityTile){
     fillIcon(cityTile, td); // fill table cell icon
 
     // Change the tile when the dropdown is changed
-    td_dropdown.addEventListener("change", () => {
+    td_dropdown.addEventListener("change", async () => {
         const firstChildHiddenID = td.firstChild; // get the identification of the td
         const secondChildDropdown = td.children[1]; // get the dropdown so it stays
         const thirdChildImg = td.children[2]; // get the first img to overwrite it
@@ -213,8 +213,8 @@ function makeTD(cityTile){
 
         //TODO: if tileType is tavern, civic, empty/landscape, bridge change the overlay images
         if(tileType === "tavern"){
-            // TODO: figure out tavern type via tavern modal
-            // TODO: overlay proper tavern icon
+            const type = await selectTavern();
+            thirdChildImg.src = `/static/icons/${tileType}_${type}_icon.png`
             firstChildHiddenID.value = `${tileType}`; // update the hidden field
         } else if(tileType === "civic"){
             // TODO: figure out civic type via civic modal
@@ -237,14 +237,9 @@ function fillIcon(tile, td){
     tile = tile.split(" ");
     if(tile[0] === "tavern"){
         const baseImg = document.createElement("img");
-        baseImg.src = `/static/icons/${tile[0]}_icon.png`;
+        baseImg.src = `/static/icons/${tile[0]}_${tile[1]}_icon.png`;
         baseImg.classList.add('baseImg');
         td.appendChild(baseImg);
-        const overlayImg1 = document.createElement("img");
-        overlayImg1.classList.add("ImgOverlay");
-        overlayImg1.classList.add(`img-${tile[1]}`);
-        overlayImg1.src = `/static/icons/tavern_${tile[1]}_icon.png`;
-        td.appendChild(overlayImg1);
     } else if(tile[0] === "civic"){
         const baseImg = document.createElement("img");
         baseImg.src = `/static/icons/${tile[0]}_icon.png`;
@@ -264,12 +259,36 @@ function fillIcon(tile, td){
         // overlayImg3.classList.add("ImgOverlay");
         // overlayImg3.classList.add("ImgOverlay3");
         // td.appendChild(overlayImg3);
+    } else if(tile[0] === "bridge"){
+        const baseImg = document.createElement("img");
+        baseImg.src = `/static/icons/${tile[0]}_${tile[1]}_icon.png`;
+        td.appendChild(baseImg);
     } else {
         const baseImg = document.createElement("img");
         baseImg.src = `/static/icons/${tile[0]}_icon.png`;
         td.appendChild(baseImg);
     }
 }
+
+function selectTavern() {
+    return new Promise(resolve => {
+        document.getElementById("tavern-modal").style.display = "block";
+        const radios = document.querySelectorAll('input[name="tavern"]');
+
+        function handler(event) {
+            const selectedValue = event.target.value;
+            document.getElementById("tavern-modal").style.display = "none";
+
+            // Clean up event listeners
+            radios.forEach(r => r.removeEventListener('change', handler));
+
+            resolve(selectedValue); // Return the selected value
+        }
+
+        radios.forEach(r => r.addEventListener('change', handler));
+    });
+}
+
 
 function getCityTiles(){
     // TODO: get the city tiles from the hidden inputs in the tds

@@ -211,7 +211,7 @@ function makeTD(cityTile){
         const tileType = td_dropdown.value; // find what the dropdown changed to
         thirdChildImg.src = `/static/icons/${tileType}_icon.png`; // change the base image
 
-        //TODO: if tileType is tavern, civic, empty/landscape, bridge change the overlay images
+        //if tileType is tavern, civic, or bridge pick options
         if(tileType === "tavern"){
             const type = await selectTavern();
             thirdChildImg.src = `/static/icons/${tileType}_${type}_icon.png`
@@ -221,8 +221,8 @@ function makeTD(cityTile){
             // TODO: overlay civic bonuses
             firstChildHiddenID.value = `${tileType}`; // update the hidden field
         } else if(tileType === "bridge"){
-            // TODO: figure out bridge direction via bridge modal
-            // TODO: get correct img
+            const type = await selectBridge();
+            thirdChildImg.src = `/static/icons/${tileType}_${type}_icon.png`
             firstChildHiddenID.value = `${tileType}`; // update the hidden field
         } else {
             firstChildHiddenID.value = tileType; // update the hidden field
@@ -244,21 +244,25 @@ function fillIcon(tile, td){
         const baseImg = document.createElement("img");
         baseImg.src = `/static/icons/${tile[0]}_icon.png`;
         td.appendChild(baseImg);
-        // const overlayImg1 = document.createElement("img");
-        // overlayImg1.src = `/static/icons/${tile[1]}_icon.png`;
-        // overlayImg1.classList.add("ImgOverlay");
-        // overlayImg1.classList.add("ImgOverlay1");
-        // td.appendChild(overlayImg1);
-        // const overlayImg2 = document.createElement("img");
-        // overlayImg2.src = `/static/icons/${tile[2]}_icon.png`;
-        // overlayImg2.classList.add("ImgOverlay");
-        // overlayImg2.classList.add("ImgOverlay2");
-        // td.appendChild(overlayImg2);
-        // const overlayImg3 = document.createElement("img");
-        // overlayImg3.src = `/static/icons/${tile[3]}_icon.png`;
-        // overlayImg3.classList.add("ImgOverlay");
-        // overlayImg3.classList.add("ImgOverlay3");
-        // td.appendChild(overlayImg3);
+
+        const overlayImg1 = document.createElement("img");
+        overlayImg1.src = `/static/icons/${tile[1]}_icon.png`;
+        overlayImg1.classList.add("imgOverlay");
+        overlayImg1.classList.add("imgOverlay1");
+        td.appendChild(overlayImg1);
+
+        const overlayImg2 = document.createElement("img");
+        overlayImg2.src = `/static/icons/${tile[2]}_icon.png`;
+        overlayImg2.classList.add("imgOverlay");
+        overlayImg2.classList.add("imgOverlay2");
+        td.appendChild(overlayImg2);
+
+        const overlayImg3 = document.createElement("img");
+        overlayImg3.src = `/static/icons/${tile[3]}_icon.png`;
+        overlayImg3.classList.add("imgOverlay");
+        overlayImg3.classList.add("imgOverlay3");
+        td.appendChild(overlayImg3);
+
     } else if(tile[0] === "bridge"){
         const baseImg = document.createElement("img");
         baseImg.src = `/static/icons/${tile[0]}_${tile[1]}_icon.png`;
@@ -284,14 +288,30 @@ function selectTavern() {
 
             resolve(selectedValue); // Return the selected value
         }
-
         radios.forEach(r => r.addEventListener('change', handler));
     });
 }
 
+function selectBridge(){
+    return new Promise(resolve => {
+        document.getElementById("bridge-modal").style.display = "block";
+        const radios = document.querySelectorAll('input[name="bridge"]');
+
+        function handler(event) {
+            const selectedValue = event.target.value;
+            document.getElementById("bridge-modal").style.display = "none";
+
+            // Clean up event listeners
+            radios.forEach(r => r.removeEventListener('change', handler));
+
+            resolve(selectedValue); // Return the selected value
+        }
+        radios.forEach(r => r.addEventListener('change', handler));
+    });
+}
 
 function getCityTiles(){
-    // TODO: get the city tiles from the hidden inputs in the tds
+    // get the city tiles from the hidden inputs in the tds
     let cityTiles = [];
 
     const table = document.getElementById("city-board-tiles");

@@ -131,7 +131,7 @@
     background-repeat: no-repeat;
     background-position: center;
 }
-#image-input-label img {
+#image-input-label .img {
     width: 100%;
     height: 100%;
     object-fit: cover; 
@@ -213,45 +213,23 @@
     margin: 0px;
 }
 
-.ImgOverlay {
-    position: absolute;
-    z-index: 2;
-    transform: translate(-100%, 0%);
-}
-.img-bar {
-    height: 45%;
-    width: 45%;
-    /* transform: translate(65%, -135%); */
-}
-.img-music {
-    height: 85%;
-    width: 85%;
-    /* transform: translate(10%, -95%); */
-}
-.img-restaurant {
-    height: 60%;
-    width: 60%;
-    /* transform: translate(30%, -120%); */
-}
-.img-inn {
-    height: 50%;
-    width: 50%;
-    /* transform: translate(50%, -130%); */
-}
 .imgOverlay1 {
-    height: 5px;
-    width: 5px;
-    transform: translate(0%, -0%);
+    position: absolute;
+    height: 25%;
+    width: 25%;
+    transform: translate(-175%, -300%);
 }
 .imgOverlay2 {
-    height: 5px;
-    width: 5px;
-    transform: translate(0%, -0%);
+    position: absolute;
+    height: 25%;
+    width: 25%;
+    transform: translate(-175%, -185%);
 }
 .imgOverlay3 {
-    height: 5px;
-    width: 5px;
-    transform: translate(0%, -0%);
+    position: absolute;
+    height: 25%;
+    width: 25%;
+    transform: translate(85%, -270%);
 }
 /* ------------------------------------------------------------------------------------------- */
 
@@ -330,7 +308,32 @@
     transform: translate(-50%, -50%);
 }
 
-.tavern-select-img {
+#bridge-modal {
+    display: none;
+    position: fixed;
+    width: 80vw;
+    height: 60vw;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 20px;
+    border: 1px solid gray;
+    z-index: 10;
+    text-align: center;
+    margin: auto;
+}
+
+#bridge-selection {
+    position: absolute;
+    text-align: center;
+    font-size: 30px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.select-img {
     transform: translate(10%, 30%);
 }
 

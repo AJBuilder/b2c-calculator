@@ -202,9 +202,9 @@ function makeTD(cityTile){
         const thirdChildImg = td.children[2]; // get the first img to overwrite it
 
         // Remove all children except the dropdown and the base img
-        for(const child of td.children){
-            if(child !== td.firstChild && child !== secondChildDropdown && child !== thirdChildImg){
-                td.remove(child)
+        for (const child of Array.from(td.children)) {
+            if (child !== firstChildHiddenID && child !== secondChildDropdown && child !== thirdChildImg) {
+                td.removeChild(child);
             }
         }
 
@@ -215,15 +215,36 @@ function makeTD(cityTile){
         if(tileType === "tavern"){
             const type = await selectTavern();
             thirdChildImg.src = `/static/icons/${tileType}_${type}_icon.png`
-            firstChildHiddenID.value = `${tileType}`; // update the hidden field
+            firstChildHiddenID.value = `${tileType} ${type}`; // update the hidden field
         } else if(tileType === "civic"){
             // TODO: figure out civic type via civic modal
             // TODO: overlay civic bonuses
-            firstChildHiddenID.value = `${tileType}`; // update the hidden field
+            const { bonus1, bonus2, negative } = await selectCivic();
+            thirdChildImg.src = `/static/icons/${tileType}_icon.png`;
+
+            const overlayImg1 = document.createElement("img");
+            overlayImg1.src = `/static/icons/${bonus1}_icon.png`;
+            overlayImg1.classList.add("imgOverlay");
+            overlayImg1.classList.add("imgOverlay1");
+            td.appendChild(overlayImg1);
+
+            const overlayImg2 = document.createElement("img");
+            overlayImg2.src = `/static/icons/${bonus2}_icon.png`;
+            overlayImg2.classList.add("imgOverlay");
+            overlayImg2.classList.add("imgOverlay2");
+            td.appendChild(overlayImg2);
+
+            const overlayImg3 = document.createElement("img");
+            overlayImg3.src = `/static/icons/${negative}_icon.png`;
+            overlayImg3.classList.add("imgOverlay");
+            overlayImg3.classList.add("imgOverlay3");
+            td.appendChild(overlayImg3);
+
+            firstChildHiddenID.value = `${tileType} ${bonus1} ${bonus2} ${negative}`; // update the hidden field
         } else if(tileType === "bridge"){
             const type = await selectBridge();
             thirdChildImg.src = `/static/icons/${tileType}_${type}_icon.png`
-            firstChildHiddenID.value = `${tileType}`; // update the hidden field
+            firstChildHiddenID.value = `${tileType} ${type}`; // update the hidden field
         } else {
             firstChildHiddenID.value = tileType; // update the hidden field
         }
@@ -292,6 +313,29 @@ function selectTavern() {
     });
 }
 
+function selectCivic() {
+    return new Promise(resolve => {
+        const modal = document.getElementById("civic-modal");
+        const confirmBtn = document.getElementById("civic-confirm-btn");
+
+        modal.style.display = "block";
+
+        function handleConfirm() {
+            const bonus1 = document.getElementById("civic-bonus1-dropdown").value;
+            const bonus2 = document.getElementById("civic-bonus2-dropdown").value;
+            const negative = document.getElementById("civic-negative-dropdown").value;
+
+            modal.style.display = "none";
+
+            confirmBtn.removeEventListener("click", handleConfirm);
+
+            resolve({ bonus1, bonus2, negative });
+        }
+
+        confirmBtn.addEventListener("click", handleConfirm);
+    });
+}
+
 function selectBridge(){
     return new Promise(resolve => {
         document.getElementById("bridge-modal").style.display = "block";
@@ -322,6 +366,7 @@ function getCityTiles(){
         }
         cityTiles.push(tr);
     }
+    console.log(cityTiles);
     return cityTiles;
 }
 

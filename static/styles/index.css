@@ -308,6 +308,40 @@
     transform: translate(-50%, -50%);
 }
 
+#civic-modal {
+    display: none;
+    position: fixed;
+    width: 80vw;
+    height: 80vw;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 20px;
+    border: 1px solid gray;
+    z-index: 10;
+    text-align: center;
+    margin: auto;
+}
+
+#civic-selection {
+    position: absolute;
+    text-align: center;
+    font-size: 30px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.civic-label {
+    font-size: medium;
+}
+
+.civic-dropdown {
+    font-size: medium;
+    width: 80%;
+}
+
 #bridge-modal {
     display: none;
     position: fixed;

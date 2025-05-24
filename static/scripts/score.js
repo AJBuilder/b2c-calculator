@@ -36,7 +36,37 @@ function scoreParks(cityTiles){
     return 0;
 }
 function scoreTaverns(cityTiles){
-    return 0;
+    const SCORES = [0,1,4,9,17];
+    let tavern_score = 0;
+    let tavern_map = {
+        "inn":0,
+        "bar":0,
+        "music":0,
+        "restaurant":0
+    };
+    for(let i = 0; i < cityTiles.length; i++){
+        for(let j = 0; j < cityTiles[i].length; j++){
+            if(cityTiles[i][j].split(" ")[0] === "tavern"){
+                tavern_map[cityTiles[i][j].split(" ")[1]] += 1
+            }
+        }
+    }
+    while(true){
+        let num_dif_types = 0;
+        for(const tavern_type in tavern_map){
+            if(tavern_map[tavern_type] > 0){
+                num_dif_types += 1;
+                tavern_map[tavern_type] -= 1;
+            }
+        }
+        if(num_dif_types === 0){
+            break;
+        }
+        tavern_score += SCORES[num_dif_types];
+        num_dif_types = 0;
+    }
+    console.log(tavern_score);
+    return tavern_score;
 }
 function scoreOffices(cityTiles){
     const SCORES = [0,1,3,6,10,15,21,22,24,27,31,36,42,43,45,48,52,57,63,64,66];

@@ -231,7 +231,7 @@ function scoreCivics(cityTiles){
         for(let j = 0; j < cityTiles[i].length; j++){
             const tile = cityTiles[i][j];
             if(tile.split(" ")[0] === "civic"){
-                let this_civic = 1;
+                let this_civic = 0;
                 const b1 = tile.split(" ")[1];
                 const b2 = tile.split(" ")[2];
                 const neg = tile.split(" ")[3];

@@ -22,6 +22,7 @@ tile_lookup = {
     GenericCityTileTypes.Shop:              'shop',
     GenericCityTileTypes.Office:            'office',
     GenericCityTileTypes.Park:              'park',
+    GenericCityTileTypes.House:             'house',
     GenericCityTileTypes.Civic:             'civic',
     GenericCityTileTypes.Landscape:         'empty',
     GenericCityTileTypes.HorizontalBridge:  'bridge horizontal',

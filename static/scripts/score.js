@@ -231,7 +231,7 @@ function scoreCivics(cityTiles){
         for(let j = 0; j < cityTiles[i].length; j++){
             const tile = cityTiles[i][j];
             if(tile.split(" ")[0] === "civic"){
-                let this_civic = 1;
+                let this_civic = 0;
                 const b1 = tile.split(" ")[1];
                 const b2 = tile.split(" ")[2];
                 const neg = tile.split(" ")[3];
@@ -239,17 +239,21 @@ function scoreCivics(cityTiles){
                 for(let neighbor of neighbors){
                     let b1_found = false;
                     let b2_found = false;
-                    if(neighbor.split(" ")[0] === neg){
+                    if(neighbor.split(" ")[3] === neg){
+                        this_civic = 1;
                         break;
                     }
                     if(b1_found == false && neighbor.split(" ")[0] === b1){
                         b1_found = true;
                         this_civic += 3
                     }
-                    if(b2_found == false && neighbor.split(" ")[0] === b2){
+                    if(b2_found == false && neighbor.split(" ")[1] === b2){
                         b2_found = true
                         this_civic += 3
                     }
+                }
+                if(this_civic == 0){
+                    this_civic = 1;
                 }
                 civic_total += this_civic;
             }

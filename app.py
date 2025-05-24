@@ -70,18 +70,18 @@ def get_calculator():
     if request.method == "GET":
         # Initial Default Values
         city_tiles: list[list[str]] = [
-            ["factory", "shop", "park", "tavern inn", "office"],
-            ["factory", "shop", "park", "office","house"],
-            ["factory", "shop", "empty", "empty", "house"],
-            ["civc factory shop house", "shop", "empty", "empty", "bridge vertical"],
-            ["tavern music", "office", "tavern food", "tavern bar", "civic tavern house factory"]
-        ]
+                ["empty", "empty", "empty", "empty", "empty"],
+                ["empty", "empty", "empty", "empty", "empty"],
+                ["empty", "empty", "empty", "empty", "empty"],
+                ["empty", "empty", "empty", "empty", "empty"],
+                ["empty", "empty", "empty", "empty", "empty"]
+            ]
         return render_template('index.html', city_tiles=city_tiles, scored=False)
     else:
         # Get the file
         file = request.files['image']
 
-        if not file.filename:
+        if file.filename == '':
             # EITHER MANUAL SCORE WAS SELECTED OR SCORE CITY WAS SELECTED WITH NO IMAGE -> GIVE EMPTY CITY
             city_tiles: list[list[str]] = [
                 ["empty", "empty", "empty", "empty", "empty"],
@@ -91,13 +91,6 @@ def get_calculator():
                 ["empty", "empty", "empty", "empty", "empty"]
             ]
             # DUMMY CITY FOR TESTING -> REPLACE WITH EMPTY CITY
-            # city_tiles: list[list[str]] = [
-            #     ["factory", "shop", "park", "tavern inn", "office"],
-            #     ["factory", "shop", "park", "office","house"],
-            #     ["factory", "shop", "empty", "empty", "house"],
-            #     ["civic factory shop house", "shop", "empty", "empty", "bridge vertical"],
-            #     ["tavern music", "office", "tavern restaurant", "tavern bar", "civic tavern house factory"]
-            # ]
             
             return render_template("index.html", city_tiles=city_tiles, scored=True)
         else:

@@ -71,6 +71,7 @@ def process_city_image(img_path: os.PathLike):
     # Load the image (provide the correct path)
     path = os.path.join(os.path.dirname(__file__), img_path)
     image = cv2.imread(path)
+    image = imutils.resize(image, min(image.shape[0], 2000))
     #cv2.imshow("Image", image)
     
     

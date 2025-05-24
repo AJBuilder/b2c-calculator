@@ -386,7 +386,8 @@ def process_city_image(img_path: os.PathLike):
         # Set the value
         matrix[row][col] = value
     for (x, y), tile in grid.items():
-        set_2d(list_grid, x, y, tile)
+        set_2d(list_grid, y, x, tile) # Janky flip since the Javascript interprets it flipped?
+        
     
     #print(list_grid)
     return list_grid

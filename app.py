@@ -128,5 +128,5 @@ def get_calculator():
             
             for col_idx, col in enumerate(city_tiles):
                 for row_idx, tile in enumerate(col):
-                    city_tiles[row_idx][col_idx] = tile_lookup.get(tile, 'error')
+                    city_tiles[col_idx][row_idx] = tile_lookup.get(tile, 'error')
             return render_template("index.html", city_tiles=city_tiles, scored=True)

@@ -71,7 +71,7 @@ def process_city_image(img_path: os.PathLike):
     # Load the image (provide the correct path)
     path = os.path.join(os.path.dirname(__file__), img_path)
     image = cv2.imread(path)
-    image = imutils.resize(image, min(image.shape[0], 2000))
+    small_image = imutils.resize(image, 500)
     #cv2.imshow("Image", image)
     
     
@@ -80,7 +80,7 @@ def process_city_image(img_path: os.PathLike):
     # We do this by finding the biggest contoured area and creating a mask for that area.
     # This is a KISS way of doing it, so might need to put in some other checks.
 
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(small_image, cv2.COLOR_BGR2GRAY)
     #cv2.imshow("gray", gray)
 
     blur = cv2.GaussianBlur(gray, (51,51), 3)
@@ -116,11 +116,14 @@ def process_city_image(img_path: os.PathLike):
                         max_area = area
                         city_countour = cont
                         
-    rect = cv2.minAreaRect(city_countour)
+    rect = list(cv2.minAreaRect(city_countour))
+    scalar = (image.shape[0] / small_image.shape[0], image.shape[1] / small_image.shape[1])
+    rect[0] = np.multiply(rect[0], scalar)
+    rect[1] = np.multiply(rect[1], scalar)
     box = cv2.boxPoints(rect)
     box = np.intp(box)
-    cv2.drawContours(image,[box],0,(0,0,255),2)
-    image = cv2.drawMarker(image,box[0],(0,0,255),2)
+    #cv2.drawContours(image,[box],0,(0,0,255),2)
+    #image = cv2.drawMarker(image, box[0],(0,0,255),2)
     #cv2.imshow("Box", image)
 
     #mask = np.zeros_like(gray)
@@ -403,3 +406,5 @@ def process_city_image(img_path: os.PathLike):
     
     
 #process_city_image(r'images\city1.png')
+#process_city_image(r'uploads\file21.jpg')
+#cv2.waitKey()

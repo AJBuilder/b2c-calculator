@@ -239,7 +239,7 @@ function scoreCivics(cityTiles){
                 for(let neighbor of neighbors){
                     let b1_found = false;
                     let b2_found = false;
-                    if(neighbor.split(" ")[0] === neg){
+                    if(neighbor.split(" ")[3] === neg){
                         this_civic = 1;
                         break;
                     }

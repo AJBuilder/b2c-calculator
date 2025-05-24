@@ -247,7 +247,7 @@ function scoreCivics(cityTiles){
                         b1_found = true;
                         this_civic += 3
                     }
-                    if(b2_found == false && neighbor.split(" ")[0] === b2){
+                    if(b2_found == false && neighbor.split(" ")[1] === b2){
                         b2_found = true
                         this_civic += 3
                     }

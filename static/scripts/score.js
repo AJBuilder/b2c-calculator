@@ -240,7 +240,6 @@ function scoreCivics(cityTiles){
                     let b1_found = false;
                     let b2_found = false;
                     if(neighbor.split(" ")[0] === neg){
-                        this_civic = 1;
                         break;
                     }
                     if(b1_found == false && neighbor.split(" ")[0] === b1){

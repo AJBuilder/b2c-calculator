@@ -13,6 +13,7 @@ class GenericCityTileTypes(StrEnum):
     Office = auto()
     Tavern = auto()
     Civic = auto()
+    House = auto()
     VerticalBridge = auto()
     HorizontalBridge = auto()
     Landscape = auto()
@@ -172,7 +173,8 @@ def process_city_image(img_path: os.PathLike):
         GenericCityTileTypes.Factory: (120, 120, 120),
         GenericCityTileTypes.Office: (255, 0, 0),
         GenericCityTileTypes.Shop: (0, 255, 255),
-        GenericCityTileTypes.Park: (0, 255, 0)
+        GenericCityTileTypes.Park: (0, 255, 0),
+        GenericCityTileTypes.House: (128, 128, 255)
     }
     tile_thresholds = {
         GenericCityTileTypes.Tavern: 0.8,
@@ -180,6 +182,7 @@ def process_city_image(img_path: os.PathLike):
         GenericCityTileTypes.Office: 0.8,
         GenericCityTileTypes.Shop: 0.8,
         GenericCityTileTypes.Park: 0.8,
+        GenericCityTileTypes.House: 0.8,
     }
     for c in CivicTileTypes:
         tile_colors[c] = (255, 0, 128)
@@ -191,6 +194,7 @@ def process_city_image(img_path: os.PathLike):
         GenericCityTileTypes.Office,
         GenericCityTileTypes.Shop,
         GenericCityTileTypes.Park,
+        GenericCityTileTypes.House,
         *set(CivicTileTypes)
     }
         

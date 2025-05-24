@@ -39,7 +39,24 @@ function scoreTaverns(cityTiles){
     return 0;
 }
 function scoreOffices(cityTiles){
-    return 0;
+    const SCORES = [0,1,3,6,10,15,21,22,24,27,31,36,42,43,45,48,52,57,63,64,66];
+    let office_count = 0;
+    let office_score = 0;
+    for(let i = 0; i < cityTiles.length; i++){
+        for(let j = 0; j < cityTiles[i].length; j++){
+            if(cityTiles[i][j] === "office"){
+                office_count += 1;
+                for(let neighbor of getNeighbors(i,j,cityTiles)){
+                    if(neighbor.split(" ")[0] === "tavern"){
+                        office_score += 1;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    console.log(`Offices: ${office_score + SCORES[office_count]}`);
+    return office_score + SCORES[office_count];
 }
 function scoreHouses(cityTiles){
     let houseList = ["factory", "shop", "park", "tavern", "office"];
@@ -214,7 +231,7 @@ function makeTD(cityTile){
         //if tileType is tavern, civic, or bridge pick options
         if(tileType === "tavern"){
             const type = await selectTavern();
-            thirdChildImg.src = `/static/icons/${tileType}_${type}_icon.png`
+            thirdChildImg.src = `/static/icons/${tileType}_${type}_icon.png`;
             firstChildHiddenID.value = `${tileType} ${type}`; // update the hidden field
         } else if(tileType === "civic"){
             // TODO: figure out civic type via civic modal
@@ -366,7 +383,6 @@ function getCityTiles(){
         }
         cityTiles.push(tr);
     }
-    console.log(cityTiles);
     return cityTiles;
 }
 

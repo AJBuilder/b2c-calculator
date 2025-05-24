@@ -71,7 +71,6 @@ def process_city_image(img_path: os.PathLike):
     # Load the image (provide the correct path)
     path = os.path.join(os.path.dirname(__file__), img_path)
     image = cv2.imread(path)
-    image = imutils.resize(image, 500)
     #cv2.imshow("Image", image)
     
     
@@ -123,15 +122,17 @@ def process_city_image(img_path: os.PathLike):
     image = cv2.drawMarker(image,box[0],(0,0,255),2)
     #cv2.imshow("Box", image)
 
-    mask = np.zeros_like(gray)
-    epsilon = 0.1*cv2.arcLength(city_countour, True)
-    approx = cv2.approxPolyDP(city_countour, epsilon, True)
-    cv2.drawContours(mask,[approx],0,255,-1)
+    #mask = np.zeros_like(gray)
+    #epsilon = 0.1*cv2.arcLength(city_countour, True)
+    #approx = cv2.approxPolyDP(city_countour, epsilon, True)
+    #cv2.drawContours(mask,[approx],0,255,-1)
     #cv2.imshow("mask", mask)
 
-    masked = np.zeros_like(gray)
-    masked[mask == 255] = blur[mask == 255]
+    #masked = np.zeros_like(gray)
+    #masked[mask == 255] = blur[mask == 255]
     #cv2.imshow("Masked", masked)
+    
+    
     
     ###### Orient city ######
     # We want to orient the city upright so that it's easier to work with.
@@ -160,6 +161,9 @@ def process_city_image(img_path: os.PathLike):
     M = cv2.getPerspectiveTransform(start_pts, end_pts)
     oriented = cv2.warpPerspective(image, M, (width, height))
     #cv2.imshow("Oriented", oriented)
+    
+    # Resize
+    oriented = imutils.resize(oriented, 500)
     
     ###### Find tiles ######
     # Now with the city identified and oriented, it's tile to identify the tiles.

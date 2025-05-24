@@ -235,7 +235,7 @@ def process_city_image(img_path: os.PathLike):
             res = cv2.matchTemplate(level, template, cv2.TM_CCOEFF_NORMED)
             locs = np.where(res>=tile_thresholds[tile_name])
             locs = np.column_stack([locs[1], locs[0]])
-            values = res[np.clip(locs[:, 0], 0, a_max=res.shape[0] - 1), np.clip(locs[:, 0], 0, a_max=res.shape[0] - 1)]
+            values = res[np.clip(locs[:, 0], 0, a_max=res.shape[0] - 1), np.clip(locs[:, 1], 0, a_max=res.shape[1] - 1)]
             # After dividing, is coordiates at 1.0 scale. Add half the size to convert to tile center.
             locations = np.clip(((locs / scale) + (tile_template_size / 2)).astype(int), [0, 0], [found_tiles.shape[0] - 1, found_tiles.shape[1] - 1])
             tile_candidates.extend(list(zip(locations.tolist(), values.tolist(), repeat(tile_name))))

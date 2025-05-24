@@ -386,7 +386,7 @@ def process_city_image(img_path: os.PathLike):
         # Set the value
         matrix[row][col] = value
     for (x, y), tile in grid.items():
-        set_2d(list_grid, x, y, tile.value)
+        set_2d(list_grid, x, y, tile)
     
     #print(list_grid)
     return list_grid

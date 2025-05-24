@@ -29,11 +29,126 @@ function scoreCity(cityTiles){
     };
 }
 
-function scoreShops(cityTiles){
-    return 0;
+function scoreShops(cityTiles) {
+    const SCORES = [0, 2, 5, 10, 15, 20]; // Max 5 shop line score
+    const rows = cityTiles.length;
+    const cols = cityTiles[0].length;
+    let totalScore = 0;
+
+    function findLongestLine() {
+        let bestLine = { length: 0, coords: [] };
+
+        // Check horizontal lines
+        for (let i = 0; i < rows; i++) {
+            let j = 0;
+            while (j < cols) {
+                if (cityTiles[i][j] === "shop") {
+                    let start = j;
+                    while (j < cols && cityTiles[i][j] === "shop") {
+                        j++;
+                    }
+                    const length = j - start;
+                    if (length > bestLine.length) {
+                        const coords = [];
+                        for (let k = start; k < j; k++) {
+                            coords.push([i, k]);
+                        }
+                        bestLine = { length, coords };
+                    }
+                } else {
+                    j++;
+                }
+            }
+        }
+
+        // Check vertical lines
+        for (let j = 0; j < cols; j++) {
+            let i = 0;
+            while (i < rows) {
+                if (cityTiles[i][j] === "shop") {
+                    let start = i;
+                    while (i < rows && cityTiles[i][j] === "shop") {
+                        i++;
+                    }
+                    const length = i - start;
+                    if (length > bestLine.length) {
+                        const coords = [];
+                        for (let k = start; k < i; k++) {
+                            coords.push([k, j]);
+                        }
+                        bestLine = { length, coords };
+                    }
+                } else {
+                    i++;
+                }
+            }
+        }
+
+        return bestLine.length > 0 ? bestLine : null;
+    }
+
+    while (true) {
+        const line = findLongestLine();
+        if (!line) break;
+
+        totalScore += SCORES[Math.min(line.length, 5)];
+        for (const [i, j] of line.coords) {
+            cityTiles[i][j] = "empty"; // Remove shops from the line
+        }
+    }
+
+    return totalScore;
 }
-function scoreParks(cityTiles){
-    return 0;
+
+function scoreParks(cityTiles) {
+    const visited = Array.from({ length: 5 }, () => Array(5).fill(false));
+
+    function inBounds(x, y) {
+        return x >= 0 && x < 5 && y >= 0 && y < 5;
+    }
+
+    function getNeighbors(x, y) {
+        const deltas = [[0,1], [1,0], [0,-1], [-1,0]];
+        return deltas
+            .map(([dx, dy]) => [x + dx, y + dy])
+            .filter(([nx, ny]) => inBounds(nx, ny));
+    }
+
+    function dfs(x, y) {
+        const stack = [[x, y]];
+        let size = 0;
+
+        while (stack.length > 0) {
+            const [cx, cy] = stack.pop();
+            if (!inBounds(cx, cy) || visited[cx][cy] || cityTiles[cx][cy] !== "park") continue;
+            visited[cx][cy] = true;
+            size += 1;
+            stack.push(...getNeighbors(cx, cy));
+        }
+
+        return size;
+    }
+
+    function parkScore(size) {
+        if (size === 0) return 0;
+        if (size === 1) return 2;
+        if (size === 2) return 8;
+        if (size === 3) return 12;
+        return 12 + (size - 3);
+    }
+
+    let totalScore = 0;
+
+    for (let i = 0; i < 5; i++) {
+        for (let j = 0; j < 5; j++) {
+            if (cityTiles[i][j] === "park" && !visited[i][j]) {
+                const size = dfs(i, j);
+                totalScore += parkScore(size);
+            }
+        }
+    }
+
+    return totalScore;
 }
 function scoreTaverns(cityTiles){
     const SCORES = [0,1,4,9,17];
@@ -85,7 +200,6 @@ function scoreOffices(cityTiles){
             }
         }
     }
-    console.log(`Offices: ${office_score + SCORES[office_count]}`);
     return office_score + SCORES[office_count];
 }
 function scoreHouses(cityTiles){
@@ -117,7 +231,7 @@ function scoreCivics(cityTiles){
         for(let j = 0; j < cityTiles[i].length; j++){
             const tile = cityTiles[i][j];
             if(tile.split(" ")[0] === "civic"){
-                let this_civic = 0;
+                let this_civic = 1;
                 const b1 = tile.split(" ")[1];
                 const b2 = tile.split(" ")[2];
                 const neg = tile.split(" ")[3];

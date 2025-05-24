@@ -51,8 +51,8 @@ tile_lookup = {
     
     TavernTileTypes.Tavern_Bed:             'tavern inn',
     TavernTileTypes.Tavern_Music:           'tavern music',
-    TavernTileTypes.Tavern_Drink:           'tavern drink',
-    TavernTileTypes.Tavern_Food:            'tavern food',
+    TavernTileTypes.Tavern_Drink:           'tavern bar',
+    TavernTileTypes.Tavern_Food:            'tavern restaurant',
     
     None:                                   'empty'
 }

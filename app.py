@@ -117,7 +117,6 @@ def get_calculator():
             #     ["factory", "factory", "factory", "factory", "factory"]
             # ]
             
-            
             city_tiles = process_city_image(file_path)
             
             for col_idx, col in enumerate(city_tiles):

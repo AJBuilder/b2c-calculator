@@ -215,6 +215,7 @@ function scoreOffices(cityTiles){
 }
 function scoreHouses(cityTiles){
     let houseList = ["factory", "shop", "park", "tavern", "office"];
+    let houseScore = 0;
     let numScoringHouses = 0;
     let numFactoryHouses = 0;
     for(let i = 0; i < cityTiles.length; i++){
@@ -226,16 +227,18 @@ function scoreHouses(cityTiles){
                     numScoringHouses += 1; // good houses
                 }
             }
-            if(tile.split(" ")[0] in houseList){
-                houseList.remove(tile.split(" ")[0]); // how much to score each house
+            if (houseList.includes(cityTiles[i][j].split(" ")[0])) {
+                houseList = houseList.filter(type => type !== cityTiles[i][j].split(" ")[0]);
+                houseScore += 1;
             }
         }
     }
-    if(houseList.length === 0){ // extremly unlikely, perhaps even impossible
+    if(houseScore == 0){ // extremly unlikely, perhaps even impossible
         return numHouses*1;
     }
-    return ((numScoringHouses*houseList.length) + (numFactoryHouses));
+    return ((numScoringHouses*houseScore) + (numFactoryHouses));
 }
+
 function scoreCivics(cityTiles){
     let civic_total = 0;
     for(let i = 0; i < cityTiles.length; i++){

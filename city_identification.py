@@ -5,6 +5,7 @@ import numpy as np
 import imutils
 from sklearn.cluster import DBSCAN
 from itertools import repeat
+from typing import TypedDict
 
 class GenericCityTileTypes(StrEnum):
     Shop = auto()
@@ -60,6 +61,13 @@ AllCityTileTypes = StrEnum('AllCityTileTypes',
     })
 
 
+class Progress(TypedDict):
+    ratio: float
+    progress_str: str
+    result: None
+
+
+
 def is_tavern(tile: str):
     return tile in TavernTileTypes or tile == GenericCityTileTypes.Tavern
         
@@ -69,8 +77,18 @@ def is_civic(tile: str):
 def process_city_image(img_path: os.PathLike):
     '''Returns a 2D list where the index is the position with the top left being the origin and the contents being the tile string.'''
     # Load the image (provide the correct path)
+    yield {
+        'ratio': 0.1,
+        'progress_str': 'Reading image...'
+    }
+    
     path = os.path.join(os.path.dirname(__file__), img_path)
     image = cv2.imread(path)
+    
+    yield {
+        'ratio': 0.2,
+        'progress_str': 'Formatting input image...'
+    }
     small_image = imutils.resize(image, 500)
     #cv2.imshow("Image", image)
     
@@ -101,6 +119,10 @@ def process_city_image(img_path: os.PathLike):
     thresh = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 23, 0)
     #cv2.imshow("thresh", thresh)
 
+    yield {
+        'ratio': 0.3,
+        'progress_str': 'Finding entire city...'
+    }
     contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     
     max_area = 0
@@ -148,6 +170,10 @@ def process_city_image(img_path: os.PathLike):
     # If the angle is more than 45, than shift the first point to the end.
     # The start of the box is in the bottom left, if it is more than 45deg rotate,
     # than the start would be in the top left of the image.
+    yield {
+        'ratio': 0.4,
+        'progress_str': 'Reorienting city...'
+    }
     if rect[2] > 45:
         box = np.roll(box, 1, 0)
         
@@ -204,6 +230,12 @@ def process_city_image(img_path: os.PathLike):
         GenericCityTileTypes.Park,
         GenericCityTileTypes.House,
         *set(CivicTileTypes)
+    }
+    
+    
+    yield {
+        'ratio': 0.5,
+        'progress_str': 'Identifying tiles...'
     }
         
     
@@ -332,6 +364,11 @@ def process_city_image(img_path: os.PathLike):
                         [location[0] + half_tile_template_size, location[1] - half_tile_template_size]])
         found_tiles = cv2.drawContours(found_tiles, [box], -1, tile_colors[name] if name in tile_colors else (255,255,255))
     
+    
+    yield {
+        'ratio': 0.7,
+        'progress_str': 'Assembling grid...'
+    }
         
     ###### Assemble grid ######
     # We do this by imposing a grid on the found tiles.
@@ -348,6 +385,10 @@ def process_city_image(img_path: os.PathLike):
     for idx, tile_name in zip(map(tuple, tile_indices), [tile_name for _, tile_name in identified_tiles]):
         grid[idx] = tile_name
     
+    yield {
+        'ratio': 0.8,
+        'progress_str': 'Identifying specific taverns...'
+    }
     
     ##### Identify specific tavern ####
     for loc, name in grid.items():
@@ -382,8 +423,8 @@ def process_city_image(img_path: os.PathLike):
         grid[loc] = best_type
                 
             
-    cv2.imshow("Tiles found", found_tiles)
-    print(grid)
+    #cv2.imshow("Tiles found", found_tiles)
+    #print(grid)
     
     list_grid = []
     def set_2d(matrix, row, col, value):
@@ -400,9 +441,13 @@ def process_city_image(img_path: os.PathLike):
     for (x, y), tile in grid.items():
         set_2d(list_grid, y, x, tile) # Janky flip since the Javascript interprets it flipped?
         
-    
     #print(list_grid)
-    return list_grid
+    yield {
+        'ratio': 1,
+        'progress_str': 'Done!',
+        'result': list_grid
+    }
+    
     
     
 #process_city_image(r'images\city1.png')

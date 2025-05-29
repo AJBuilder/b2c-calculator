@@ -1,4 +1,5 @@
 import os
+import traceback
 from flask import Flask, render_template, request, redirect, url_for, flash
 from city_identification import CivicTileTypes, GenericCityTileTypes, TavernTileTypes, process_city_image
 
@@ -80,27 +81,25 @@ def get_calculator():
     else:
         # Get the file
         file = request.files['image']
-
+        
+        # Start with empty city.
+        city_tiles: list[list[str]] = [
+            ["empty", "empty", "empty", "empty", "empty"],
+            ["empty", "empty", "empty", "empty", "empty"],
+            ["empty", "empty", "empty", "empty", "empty"],
+            ["empty", "empty", "empty", "empty", "empty"],
+            ["empty", "empty", "empty", "empty", "empty"]
+        ]
+        
         if file.filename == '':
             # EITHER MANUAL SCORE WAS SELECTED OR SCORE CITY WAS SELECTED WITH NO IMAGE -> GIVE EMPTY CITY
-            city_tiles: list[list[str]] = [
-                ["empty", "empty", "empty", "empty", "empty"],
-                ["empty", "empty", "empty", "empty", "empty"],
-                ["empty", "empty", "empty", "empty", "empty"],
-                ["empty", "empty", "empty", "empty", "empty"],
-                ["empty", "empty", "empty", "empty", "empty"]
-            ]
-            # DUMMY CITY FOR TESTING -> REPLACE WITH EMPTY CITY
-            
             return render_template("index.html", city_tiles=city_tiles, scored=True)
         else:
             # Rename the file
-            # TODO: REPLACE THIS WITH PASSING THE IMAGE TO THE PROCESSOR
             file.filename = f"file{len([f for f in os.listdir('uploads') if os.path.isfile(os.path.join('uploads', f))]) + 1}.jpg"
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
             file.save(file_path)
 
-            # TODO: REPLACE WITH PROCESSOR OUTPUT
             # TODO: DUMMY CITY FOR TESTING
             #city_tiles: list[list[str]] = [
             #    ["factory", "shop", "park", "tavern inn", "office"],
@@ -117,10 +116,21 @@ def get_calculator():
             #     ["factory", "factory", "factory", "factory", "factory"]
             # ]
             
+            try:
+                for progress in process_city_image(file_path):
+                    # TODO: Utilize "ratio" and "progress_str" fields for some kind of progress bar.
+                    # Might need to run process_city_image in a seperate thread so this can return a page?
+                    result = progress.get('result', None)
+                    if result is not None:
+                        for col_idx, col in enumerate(result):
+                            for row_idx, tile in enumerate(col):
+                                city_tiles[col_idx][row_idx] = tile_lookup.get(tile, 'error')
+
+                        break # This break might not be necessary?
+            except Exception as e:
+                print('Exception during process_city_image: \n' + traceback.format_exc())
             
-            city_tiles = process_city_image(file_path)
-            
-            for col_idx, col in enumerate(city_tiles):
-                for row_idx, tile in enumerate(col):
-                    city_tiles[col_idx][row_idx] = tile_lookup.get(tile, 'error')
+            # Cleanup the file
+            if os.path.exists(file_path):
+                os.remove(file_path)
             return render_template("index.html", city_tiles=city_tiles, scored=True)

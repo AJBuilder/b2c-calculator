@@ -125,7 +125,6 @@ def get_calculator():
                         for col_idx, col in enumerate(result):
                             for row_idx, tile in enumerate(col):
                                 city_tiles[col_idx][row_idx] = tile_lookup.get(tile, 'error')
-
                         break # This break might not be necessary?
             except Exception as e:
                 print('Exception during process_city_image: \n' + traceback.format_exc())
@@ -133,4 +132,5 @@ def get_calculator():
             # Cleanup the file
             if os.path.exists(file_path):
                 os.remove(file_path)
+                
             return render_template("index.html", city_tiles=city_tiles, scored=True)

@@ -30,75 +30,86 @@ function scoreCity(cityTiles){
 }
 
 function scoreShops(cityTiles) {
-    const SCORES = [0, 2, 5, 10, 15, 20]; // Max 5 shop line score
+    const SCORES = [0, 2, 5, 10, 15, 20];
     const rows = cityTiles.length;
     const cols = cityTiles[0].length;
+    let used = new Set();
     let totalScore = 0;
 
-    function findLongestLine() {
-        let bestLine = { length: 0, coords: [] };
+    function getKey(i, j) {
+        return `${i},${j}`;
+    }
 
-        // Check horizontal lines
+    function collectLines() {
+        const lines = [];
+
+        // Horizontal lines
         for (let i = 0; i < rows; i++) {
             let j = 0;
             while (j < cols) {
                 if (cityTiles[i][j] === "shop") {
                     let start = j;
-                    while (j < cols && cityTiles[i][j] === "shop") {
-                        j++;
+                    while (j < cols && cityTiles[i][j] === "shop") j++;
+                    let length = j - start;
+                    let coords = [];
+                    for (let k = start; k < j; k++) {
+                        coords.push([i, k]);
                     }
-                    const length = j - start;
-                    if (length > bestLine.length) {
-                        const coords = [];
-                        for (let k = start; k < j; k++) {
-                            coords.push([i, k]);
-                        }
-                        bestLine = { length, coords };
-                    }
+                    lines.push({ length, coords, isVertical: false });
                 } else {
                     j++;
                 }
             }
         }
 
-        // Check vertical lines
+        // Vertical lines
         for (let j = 0; j < cols; j++) {
             let i = 0;
             while (i < rows) {
                 if (cityTiles[i][j] === "shop") {
                     let start = i;
-                    while (i < rows && cityTiles[i][j] === "shop") {
-                        i++;
+                    while (i < rows && cityTiles[i][j] === "shop") i++;
+                    let length = i - start;
+                    let coords = [];
+                    for (let k = start; k < i; k++) {
+                        coords.push([k, j]);
                     }
-                    const length = i - start;
-                    if (length > bestLine.length) {
-                        const coords = [];
-                        for (let k = start; k < i; k++) {
-                            coords.push([k, j]);
-                        }
-                        bestLine = { length, coords };
-                    }
+                    lines.push({ length, coords, isVertical: true });
                 } else {
                     i++;
                 }
             }
         }
 
-        return bestLine.length > 0 ? bestLine : null;
+        return lines;
     }
 
-    while (true) {
-        const line = findLongestLine();
-        if (!line) break;
+    const allLines = collectLines();
 
+    // Score and sort lines descending by score
+    allLines.sort((a, b) => {
+        const scoreA = SCORES[Math.min(a.length, 5)];
+        const scoreB = SCORES[Math.min(b.length, 5)];
+        return scoreB - scoreA;
+    });
+
+    for (const line of allLines) {
+        // Skip if any tile already used
+        if (line.coords.some(([i, j]) => used.has(getKey(i, j)))) continue;
+
+        // Score the line
         totalScore += SCORES[Math.min(line.length, 5)];
+
+        // Mark tiles as used
         for (const [i, j] of line.coords) {
-            cityTiles[i][j] = "empty"; // Remove shops from the line
+            used.add(getKey(i, j));
         }
     }
 
     return totalScore;
 }
+
+
 
 function scoreParks(cityTiles) {
     const visited = Array.from({ length: 5 }, () => Array(5).fill(false));
@@ -204,6 +215,7 @@ function scoreOffices(cityTiles){
 }
 function scoreHouses(cityTiles){
     let houseList = ["factory", "shop", "park", "tavern", "office"];
+    let houseScore = 0;
     let numScoringHouses = 0;
     let numFactoryHouses = 0;
     for(let i = 0; i < cityTiles.length; i++){
@@ -215,16 +227,18 @@ function scoreHouses(cityTiles){
                     numScoringHouses += 1; // good houses
                 }
             }
-            if(tile.split(" ")[0] in houseList){
-                houseList.remove(tile.split(" ")[0]); // how much to score each house
+            if (houseList.includes(cityTiles[i][j].split(" ")[0])) {
+                houseList = houseList.filter(type => type !== cityTiles[i][j].split(" ")[0]);
+                houseScore += 1;
             }
         }
     }
-    if(houseList.length === 0){ // extremly unlikely, perhaps even impossible
+    if(houseScore == 0){ // extremly unlikely, perhaps even impossible
         return numHouses*1;
     }
-    return ((numScoringHouses*houseList.length) + (numFactoryHouses));
+    return ((numScoringHouses*houseScore) + (numFactoryHouses));
 }
+
 function scoreCivics(cityTiles){
     let civic_total = 0;
     for(let i = 0; i < cityTiles.length; i++){
@@ -239,7 +253,7 @@ function scoreCivics(cityTiles){
                 for(let neighbor of neighbors){
                     let b1_found = false;
                     let b2_found = false;
-                    if(neighbor.split(" ")[2] === neg){
+                    if(neighbor.split(" ")[0] === neg){
                         this_civic = 1;
                         break;
                     }
@@ -247,7 +261,7 @@ function scoreCivics(cityTiles){
                         b1_found = true;
                         this_civic += 3
                     }
-                    if(b2_found == false && neighbor.split(" ")[1] === b2){
+                    if(b2_found == false && neighbor.split(" ")[0] === b2){
                         b2_found = true
                         this_civic += 3
                     }

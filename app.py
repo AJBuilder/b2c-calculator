@@ -118,6 +118,7 @@ def get_calculator():
                                 city_tiles[col_idx][row_idx] = tile_lookup.get(tile, 'error')
                         break # This break might not be necessary?
             except Exception as e:
+                # TODO: do some better failure message
                 print('Exception during process_city_image: \n' + traceback.format_exc())
             
             # Cleanup the file

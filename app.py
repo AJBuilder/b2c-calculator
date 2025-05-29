@@ -68,28 +68,19 @@ def get_index():
 # The route where the calculator app is located
 @app.route('/Calculator', methods = ("GET", "POST"))
 def get_calculator():
-    if request.method == "GET":
-        # Initial Default Values
-        city_tiles: list[list[str]] = [
-                ["empty", "empty", "empty", "empty", "empty"],
-                ["empty", "empty", "empty", "empty", "empty"],
-                ["empty", "empty", "empty", "empty", "empty"],
-                ["empty", "empty", "empty", "empty", "empty"],
-                ["empty", "empty", "empty", "empty", "empty"]
-            ]
-        return render_template('index.html', city_tiles=city_tiles, scored=False)
-    else:
-        # Get the file
-        file = request.files['image']
-        
-        # Start with empty city.
-        city_tiles: list[list[str]] = [
+    # Initial Default Values
+    city_tiles: list[list[str]] = [
             ["empty", "empty", "empty", "empty", "empty"],
             ["empty", "empty", "empty", "empty", "empty"],
             ["empty", "empty", "empty", "empty", "empty"],
             ["empty", "empty", "empty", "empty", "empty"],
             ["empty", "empty", "empty", "empty", "empty"]
         ]
+    if request.method == "GET":
+        return render_template('index.html', city_tiles=city_tiles, scored=False)
+    else:
+        # Get the file
+        file = request.files['image']
         
         if file.filename == '':
             # EITHER MANUAL SCORE WAS SELECTED OR SCORE CITY WAS SELECTED WITH NO IMAGE -> GIVE EMPTY CITY

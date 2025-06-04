@@ -90,22 +90,6 @@ def get_calculator():
             file.filename = f"file{len([f for f in os.listdir('uploads') if os.path.isfile(os.path.join('uploads', f))]) + 1}.jpg"
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
             file.save(file_path)
-
-            # TODO: DUMMY CITY FOR TESTING
-            #city_tiles: list[list[str]] = [
-            #    ["factory", "shop", "park", "tavern inn", "office"],
-            #    ["factory", "shop", "park", "office","house"],
-            #    ["factory", "shop", "empty", "empty", "house"],
-            #    ["civic factory shop house", "shop", "empty", "empty", "bridge vertical"],
-            #    ["tavern music", "office", "tavern restaurant", "tavern bar", "civic tavern house factory"]
-            #]
-            # city_tiles: list[list[str]] = [
-            #     ["factory", "factory", "factory", "factory", "factory"],
-            #     ["factory", "factory", "factory", "factory", "factory"],
-            #     ["factory", "factory", "factory", "factory", "factory"],
-            #     ["factory", "factory", "factory", "factory", "factory"],
-            #     ["factory", "factory", "factory", "factory", "factory"]
-            # ]
             
             try:
                 for progress in process_city_image(file_path):

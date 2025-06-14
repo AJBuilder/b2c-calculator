@@ -1,4 +1,5 @@
 import os
+import traceback
 from flask import Flask, render_template, request, redirect, url_for, flash
 from city_identification import CivicTileTypes, GenericCityTileTypes, TavernTileTypes, process_city_image
 
@@ -67,59 +68,45 @@ def get_index():
 # The route where the calculator app is located
 @app.route('/Calculator', methods = ("GET", "POST"))
 def get_calculator():
+    # Initial Default Values
+    city_tiles: list[list[str]] = [
+            ["empty", "empty", "empty", "empty", "empty"],
+            ["empty", "empty", "empty", "empty", "empty"],
+            ["empty", "empty", "empty", "empty", "empty"],
+            ["empty", "empty", "empty", "empty", "empty"],
+            ["empty", "empty", "empty", "empty", "empty"]
+        ]
     if request.method == "GET":
-        # Initial Default Values
-        city_tiles: list[list[str]] = [
-                ["empty", "empty", "empty", "empty", "empty"],
-                ["empty", "empty", "empty", "empty", "empty"],
-                ["empty", "empty", "empty", "empty", "empty"],
-                ["empty", "empty", "empty", "empty", "empty"],
-                ["empty", "empty", "empty", "empty", "empty"]
-            ]
         return render_template('index.html', city_tiles=city_tiles, scored=False)
     else:
         # Get the file
         file = request.files['image']
-
+        
         if file.filename == '':
             # EITHER MANUAL SCORE WAS SELECTED OR SCORE CITY WAS SELECTED WITH NO IMAGE -> GIVE EMPTY CITY
-            city_tiles: list[list[str]] = [
-                ["empty", "empty", "empty", "empty", "empty"],
-                ["empty", "empty", "empty", "empty", "empty"],
-                ["empty", "empty", "empty", "empty", "empty"],
-                ["empty", "empty", "empty", "empty", "empty"],
-                ["empty", "empty", "empty", "empty", "empty"]
-            ]
-            # DUMMY CITY FOR TESTING -> REPLACE WITH EMPTY CITY
-            
             return render_template("index.html", city_tiles=city_tiles, scored=True)
         else:
             # Rename the file
-            # TODO: REPLACE THIS WITH PASSING THE IMAGE TO THE PROCESSOR
             file.filename = f"file{len([f for f in os.listdir('uploads') if os.path.isfile(os.path.join('uploads', f))]) + 1}.jpg"
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
             file.save(file_path)
-
-            # TODO: REPLACE WITH PROCESSOR OUTPUT
-            # TODO: DUMMY CITY FOR TESTING
-            #city_tiles: list[list[str]] = [
-            #    ["factory", "shop", "park", "tavern inn", "office"],
-            #    ["factory", "shop", "park", "office","house"],
-            #    ["factory", "shop", "empty", "empty", "house"],
-            #    ["civic factory shop house", "shop", "empty", "empty", "bridge vertical"],
-            #    ["tavern music", "office", "tavern restaurant", "tavern bar", "civic tavern house factory"]
-            #]
-            # city_tiles: list[list[str]] = [
-            #     ["factory", "factory", "factory", "factory", "factory"],
-            #     ["factory", "factory", "factory", "factory", "factory"],
-            #     ["factory", "factory", "factory", "factory", "factory"],
-            #     ["factory", "factory", "factory", "factory", "factory"],
-            #     ["factory", "factory", "factory", "factory", "factory"]
-            # ]
             
-            city_tiles = process_city_image(file_path)
+            try:
+                for progress in process_city_image(file_path):
+                    # TODO: Utilize "ratio" and "progress_str" fields for some kind of progress bar.
+                    # Might need to run process_city_image in a seperate thread so this can return a page?
+                    result = progress.get('result', None)
+                    if result is not None:
+                        for col_idx, col in enumerate(result):
+                            for row_idx, tile in enumerate(col):
+                                city_tiles[col_idx][row_idx] = tile_lookup.get(tile, 'error')
+                        break # This break might not be necessary?
+            except Exception as e:
+                # TODO: do some better failure message
+                print('Exception during process_city_image: \n' + traceback.format_exc())
             
-            for col_idx, col in enumerate(city_tiles):
-                for row_idx, tile in enumerate(col):
-                    city_tiles[col_idx][row_idx] = tile_lookup.get(tile, 'error')
+            # Cleanup the file
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                
             return render_template("index.html", city_tiles=city_tiles, scored=True)

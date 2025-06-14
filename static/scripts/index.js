@@ -1,4 +1,3 @@
-
 window.addEventListener("DOMContentLoaded", async () => {
 
     // District Collapsible Element
@@ -35,5 +34,26 @@ window.addEventListener("DOMContentLoaded", async () => {
     } else {
         document.getElementById("page-container").removeChild(document.getElementById("score-area"));
     }
+
+    // ============================
+    // Toggle custom input fields for district dropdowns
+    // ============================
+    const dropdowns = document.querySelectorAll("#district-scoring select");
+
+    dropdowns.forEach(dropdown => {
+        dropdown.addEventListener("change", () => {
+            const customInputId = dropdown.id.replace("dropdown", "custom");
+            const customInput = document.getElementById(customInputId);
+
+            if (dropdown.value === "custom") {
+                customInput.style.display = "inline-block";
+            } else {
+                if (customInput) {
+                    customInput.style.display = "none";
+                    customInput.value = "";
+                }
+            }
+        });
+    });
 
 });

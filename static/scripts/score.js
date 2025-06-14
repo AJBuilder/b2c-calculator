@@ -6,12 +6,19 @@ window.addEventListener("DOMContentLoaded", async () => {
         // Create the City Grid View
         fillCityTable();
 
+
+
         // Dynamic Score Updating
         populateScore();
         document.getElementById("factory-dropdown").addEventListener("change", populateScore);
         document.getElementById("district1-dropdown").addEventListener("change", populateScore);
         document.getElementById("district2-dropdown").addEventListener("change", populateScore);
         document.getElementById("district3-dropdown").addEventListener("change", populateScore);
+
+        // Auto-update on custom input typing
+        document.querySelectorAll(".custom-input").forEach(input => {
+            input.addEventListener("input", populateScore);
+        });
     }
 
 });
@@ -288,14 +295,27 @@ function scoreFactories(cityTiles){
     return factoryValue * numFactories;
 }
 
-// populates score changes through the frontend
+function getDistrictScore(dropdownId) {
+    const dropdown = document.getElementById(dropdownId);
+    const customInput = document.getElementById(dropdownId.replace("dropdown", "custom"));
+
+    if (dropdown.value === "custom" && customInput && customInput.value !== "") {
+        return Number(customInput.value);
+    }
+    return Number(dropdown.value);
+}
+
 function populateScore(){
     const cityTiles = getCityTiles();
     const scores = scoreCity(cityTiles);
 
-    document.getElementById("district1-score").innerText = document.getElementById("district1-dropdown").value;
-    document.getElementById("district2-score").innerText = document.getElementById("district2-dropdown").value;
-    document.getElementById("district3-score").innerText = document.getElementById("district3-dropdown").value;
+    const d1Score = getDistrictScore("district1-dropdown");
+    const d2Score = getDistrictScore("district2-dropdown");
+    const d3Score = getDistrictScore("district3-dropdown");
+
+    document.getElementById("district1-score").innerText = d1Score;
+    document.getElementById("district2-score").innerText = d2Score;
+    document.getElementById("district3-score").innerText = d3Score;
 
     document.getElementById("shop-score").innerText = scores.shop_score;
     document.getElementById("factory-score").innerText = scores.factory_score;
@@ -305,16 +325,15 @@ function populateScore(){
     document.getElementById("house-score").innerText = scores.house_score;
     document.getElementById("civic-score").innerText = scores.civic_score;
 
-    total = scores.factory_score;
-    total += scores.shop_score;
-    total += scores.park_score;
-    total += scores.office_score;
-    total += scores.tavern_score;
-    total += scores.house_score;
-    total += scores.civic_score;
-    total += Number(document.getElementById("district1-dropdown").value);
-    total += Number(document.getElementById("district2-dropdown").value);
-    total += Number(document.getElementById("district3-dropdown").value);
+    let total = scores.factory_score
+        + scores.shop_score
+        + scores.park_score
+        + scores.office_score
+        + scores.tavern_score
+        + scores.house_score
+        + scores.civic_score
+        + d1Score + d2Score + d3Score;
+
     document.getElementById("total-score-box").innerText = total;
     document.getElementById("total-score-heading").innerText = total;
 }

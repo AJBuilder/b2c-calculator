@@ -108,5 +108,7 @@ def get_calculator():
             # Cleanup the file
             if os.path.exists(file_path):
                 os.remove(file_path)
+
+            print(city_tiles)
                 
             return render_template("index.html", city_tiles=city_tiles, scored=True)

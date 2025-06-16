@@ -12,7 +12,6 @@
     align-items: center;
     background-color: white;
     color: gray;
-    cursor: pointer;
     padding-top: 7px;
     padding-bottom: 7px;
     padding-left: 5px;
@@ -43,16 +42,14 @@
 /* ------------------------------------------------------------------------------------------- */
 /* Center the entire district scoring section */
 #district-scoring {
-    display: flex;
+    display: none; /* start hidden */
     flex-direction: column;
     justify-content: center;
-}
-#district-scoring {
-    display: none;
     align-items: center;
     border-bottom: 1px solid #aaa;
     background-color: #f0f0f0;
 }
+
 #factory-scoring {
     width: 100%;
     border-bottom: 1px solid #aaa;

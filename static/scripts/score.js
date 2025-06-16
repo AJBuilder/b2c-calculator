@@ -6,19 +6,13 @@ window.addEventListener("DOMContentLoaded", async () => {
         // Create the City Grid View
         fillCityTable();
 
-
-
         // Dynamic Score Updating
         populateScore();
         document.getElementById("factory-dropdown").addEventListener("change", populateScore);
-        document.getElementById("district1-dropdown").addEventListener("change", populateScore);
-        document.getElementById("district2-dropdown").addEventListener("change", populateScore);
-        document.getElementById("district3-dropdown").addEventListener("change", populateScore);
-
-        // Auto-update on custom input typing
-        document.querySelectorAll(".custom-input").forEach(input => {
-            input.addEventListener("input", populateScore);
+        ["district1-score-input", "district2-score-input", "district3-score-input"].forEach(id => {
+            document.getElementById(id).addEventListener("input", populateScore);
         });
+
     }
 
 });
@@ -198,7 +192,6 @@ function scoreTaverns(cityTiles){
         tavern_score += SCORES[num_dif_types];
         num_dif_types = 0;
     }
-    console.log(tavern_score);
     return tavern_score;
 }
 function scoreOffices(cityTiles){
@@ -295,23 +288,16 @@ function scoreFactories(cityTiles){
     return factoryValue * numFactories;
 }
 
-function getDistrictScore(dropdownId) {
-    const dropdown = document.getElementById(dropdownId);
-    const customInput = document.getElementById(dropdownId.replace("dropdown", "custom"));
-
-    if (dropdown.value === "custom" && customInput && customInput.value !== "") {
-        return Number(customInput.value);
-    }
-    return Number(dropdown.value);
-}
-
 function populateScore(){
     const cityTiles = getCityTiles();
     const scores = scoreCity(cityTiles);
 
-    const d1Score = getDistrictScore("district1-dropdown");
-    const d2Score = getDistrictScore("district2-dropdown");
-    const d3Score = getDistrictScore("district3-dropdown");
+    const d1Score = parseInt(document.getElementById("district1-score-input").value) || 0;
+    const d2Score = parseInt(document.getElementById("district2-score-input").value) || 0;
+    const d3Score = parseInt(document.getElementById("district3-score-input").value) || 0;
+
+    console.log(`RUNNING: ${d1Score}`);
+
 
     document.getElementById("district1-score").innerText = d1Score;
     document.getElementById("district2-score").innerText = d2Score;

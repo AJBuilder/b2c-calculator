@@ -292,12 +292,9 @@ function populateScore(){
     const cityTiles = getCityTiles();
     const scores = scoreCity(cityTiles);
 
-    const d1Score = parseInt(document.getElementById("district1-score-input").value) || 0;
-    const d2Score = parseInt(document.getElementById("district2-score-input").value) || 0;
-    const d3Score = parseInt(document.getElementById("district3-score-input").value) || 0;
-
-    console.log(`RUNNING: ${d1Score}`);
-
+    const d1Score = Number(document.getElementById("district1-score-input").value);
+    const d2Score = Number(document.getElementById("district2-score-input").value);
+    const d3Score = Number(document.getElementById("district3-score-input").value);
 
     document.getElementById("district1-score").innerText = d1Score;
     document.getElementById("district2-score").innerText = d2Score;

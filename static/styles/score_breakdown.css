@@ -1,0 +1,48 @@
+#total-score-heading {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    padding-top: 5px;
+    margin-bottom: 0px;
+}
+
+/* ------------------------------------------------------------------------------------------- */
+/* Score Breakdown Area */
+#score-breakdown {
+    padding-top: 0px;
+    margin: 0px;
+    height: 80%;
+    width: 90%;
+}
+
+#score-breakdown-table {
+    padding: 0px;
+    margin: 0px;
+    width: 90vw;
+    height: 130vw;
+    font-size: 20px;
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+}
+
+#score-breakdown-table {
+    border-collapse: collapse;
+}
+
+#score-breakdown-table tr {
+    border-bottom: 1px solid #aaa;
+}
+#score-breakdown-table tr:last-child {
+    border-bottom: none;
+}
+
+#score-breakdown-table td {
+    padding-left: 20px;
+    padding-top: 5px;
+}
+
+#total-score-box {
+    font-size: 25px;
+}
+/* ------------------------------------------------------------------------------------------- */

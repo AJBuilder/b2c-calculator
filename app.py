@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from city_identification import CivicTileTypes, GenericCityTileTypes, TavernTileTypes, process_city_image
 
 # Setup and Config
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', template_folder='templates')
 # TODO: FOLDER TO SAVE IMAGES TO WILL NOT BE NEEDED IN THE FUTURE -> REMOVE WHEN READY
 app.config['UPLOAD_FOLDER'] = 'uploads'  # Folder where images will be stored
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Limit file size to 16MB

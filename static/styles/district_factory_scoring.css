@@ -1,0 +1,99 @@
+/* ------------------------------------------------------------------------------------------- */
+/* District Scoring Area */
+#district-collapsible {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    color: gray;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    padding-left: 5px;
+    padding-right: 5px;
+    width: 100%;
+    border-bottom: 1px solid #aaa;
+    text-align: left;
+    font-size: 100%;
+    cursor: pointer;
+}
+
+#downArrow {
+    color: gray;
+    width: 25px;
+    height: 25px;
+    background-color: transparent;
+    /* This icon was from: https://icons8.com/icons/set/down-arrow--static--middle-gray */
+    background-image: url('/static/icons/icons8-down-arrow-50.png'); /* Gray arrow icon */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    text-decoration: none;
+    overflow: hidden;
+    white-space: nowrap;
+}
+/* ------------------------------------------------------------------------------------------- */
+
+/* ------------------------------------------------------------------------------------------- */
+/* Center the entire district scoring section */
+#district-scoring {
+    display: none; /* start hidden */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid #aaa;
+    background-color: #f0f0f0;
+}
+
+#factory-scoring {
+    width: 100%;
+    border-bottom: 1px solid #aaa;
+    padding: 7px 5px; 
+}
+#factory-scoring .label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    color: gray;
+    padding-left: 5px;
+    padding-right: 5px;
+    width: 100%;
+    text-align: left;
+    font-size: 100%;
+}
+
+/* Align label and dropdown side by side */
+.district-row, .factory-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* Adds space between label and dropdown */
+    margin: 5px 0;
+}
+
+/* Ensure labels and dropdowns are properly aligned */
+.label {
+    font-size: 25px;
+    color: gray;
+    text-align: right;
+}
+
+#district-scoring .input {
+    min-width: 20px;
+}
+
+/* Dropdown styling */
+.selection {
+    margin: 0;
+    padding: 0;
+    margin-right: 10px;
+    width: 60px;
+    height: 40px; 
+    text-align: center;
+    font-size: 20px;
+    color: gray; 
+    background-color: white;
+    border: 1px solid #aaa; 
+    border-radius: 0px;
+}
+/* ------------------------------------------------------------------------------------------- */

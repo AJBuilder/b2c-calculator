@@ -1,0 +1,84 @@
+/* ------------------------------------------------------------------------------------------- */
+/* City Table */
+
+#city-board-container {
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    width: 100vw;
+    height: 100vw;
+    padding: 0px;
+    margin: 0px;
+}
+
+#city-board-tiles {
+    width: 90%;
+    height: 90%;
+    border-collapse: collapse; 
+    table-layout: fixed; 
+    padding: 0px;
+    margin: 0px;
+}
+
+#city-board-container select {
+    appearance: none;
+    -webkit-appearance: none; /* Safari/Chrome */
+    -moz-appearance: none;    /* Firefox */
+    background: transparent;
+    border: none;
+}
+
+#city-board-container select option {
+    font-size: 16px;
+    color: black;
+}
+
+/* Ensure each cell remains square */
+#city-board-tiles td {
+    aspect-ratio: 1 / 1;
+    width: 10%;
+    text-align: center;
+    justify-content: center;
+    border: 1px solid #ddd; 
+    position: relative;
+}
+
+.baseImg {
+    z-index: 1;
+}
+
+#city-board-tiles select {
+    position: absolute;
+    width: 85%;          
+    height: 85%;     
+    font-size: 0px;       
+    border-radius: 0px;   
+    background-color: transparent; 
+    border-color: transparent;
+    cursor: pointer; 
+    z-index: 5;
+    transform: translate(0%, -5%);
+    padding: 0px;
+    margin: 0px;
+}
+
+.imgOverlay1 {
+    position: absolute;
+    height: 25%;
+    width: 25%;
+    transform: translate(-175%, -300%);
+}
+.imgOverlay2 {
+    position: absolute;
+    height: 25%;
+    width: 25%;
+    transform: translate(-175%, -185%);
+}
+.imgOverlay3 {
+    position: absolute;
+    height: 25%;
+    width: 25%;
+    transform: translate(85%, -270%);
+}
+/* ------------------------------------------------------------------------------------------- */

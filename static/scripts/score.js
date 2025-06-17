@@ -250,9 +250,9 @@ function scoreCivics(cityTiles){
                 const b2 = tile.split(" ")[2];
                 const neg = tile.split(" ")[3];
                 const neighbors = getNeighbors(i, j, cityTiles);
+                let b1_found = false;
+                let b2_found = false;
                 for(let neighbor of neighbors){
-                    let b1_found = false;
-                    let b2_found = false;
                     if(neighbor.split(" ")[0] === neg){
                         this_civic = 1;
                         break;

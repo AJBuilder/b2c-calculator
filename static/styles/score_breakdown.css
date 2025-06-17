@@ -1,3 +1,14 @@
+
+#score-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;   /* horizontally center everything inside */
+    justify-content: flex-start;  /* change to center if you want vertical centering too */
+    text-align: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
 #total-score-heading {
     display: flex;
     flex-direction: column; 
@@ -16,14 +27,14 @@
 }
 
 #score-breakdown-table {
-    padding: 0px;
-    margin: 0px;
-    width: 90vw;
-    height: 130vw;
+    width: 20vw;
+    height: 80vh;
+    min-width: 200px;
     font-size: 20px;
-    display: flex;
-    flex-direction: column; 
-    align-items: center; 
+    padding: 0px;
+    margin: 0 auto; /* ← Centers horizontally */
+    border-collapse: collapse; /* keep this */
+    text-align: left;
 }
 
 #score-breakdown-table {

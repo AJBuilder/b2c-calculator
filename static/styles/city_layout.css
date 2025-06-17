@@ -67,20 +67,28 @@
 
 .imgOverlay1 {
     position: absolute;
+    top: 15%;
+    left: 7.5%;
     height: 25%;
     width: 25%;
-    transform: translate(-175%, -300%);
+    z-index: 2;
 }
+
 .imgOverlay2 {
     position: absolute;
+    bottom: 25%;
+    left: 7.5%;
     height: 25%;
     width: 25%;
-    transform: translate(-175%, -185%);
+    z-index: 2;
 }
+
 .imgOverlay3 {
     position: absolute;
+    top: 25%;
+    right: 7.5%;
     height: 25%;
     width: 25%;
-    transform: translate(85%, -270%);
+    z-index: 2;
 }
 /* ------------------------------------------------------------------------------------------- */

@@ -78,7 +78,7 @@
     text-align: right;
 }
 
-#district-scoring .input {
+#district-scoring input {
     min-width: 20px;
 }
 

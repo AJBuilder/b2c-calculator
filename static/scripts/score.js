@@ -17,6 +17,267 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 });
 
+function populateScore(){
+    const cityTiles = getCityTiles();
+    const scores = scoreCity(cityTiles);
+
+    const d1Score = Number(document.getElementById("district1-score-input").value);
+    const d2Score = Number(document.getElementById("district2-score-input").value);
+    const d3Score = Number(document.getElementById("district3-score-input").value);
+
+    document.getElementById("district1-score").innerText = d1Score;
+    document.getElementById("district2-score").innerText = d2Score;
+    document.getElementById("district3-score").innerText = d3Score;
+
+    document.getElementById("shop-score").innerText = scores.shop_score;
+    document.getElementById("factory-score").innerText = scores.factory_score;
+    document.getElementById("park-score").innerText = scores.park_score;
+    document.getElementById("office-score").innerText = scores.office_score;
+    document.getElementById("tavern-score").innerText = scores.tavern_score;
+    document.getElementById("house-score").innerText = scores.house_score;
+    document.getElementById("civic-score").innerText = scores.civic_score;
+
+    let total = scores.factory_score
+        + scores.shop_score
+        + scores.park_score
+        + scores.office_score
+        + scores.tavern_score
+        + scores.house_score
+        + scores.civic_score
+        + d1Score + d2Score + d3Score;
+
+    document.getElementById("total-score-box").innerText = total;
+    document.getElementById("total-score-heading").innerText = total;
+}
+
+// Functions to fill in the city tile grid
+function fillCityTable(){
+    const cityTable = document.getElementById("city-board-tiles");
+    const cityTiles = JSON.parse(document.getElementById("city-tiles").value.replaceAll("\'", "\""));
+
+    for(const cityRow of cityTiles){
+        cityTable.appendChild(makeTR(cityRow));
+    }
+}
+
+function makeTR(cityRow){
+    const tr = document.createElement("tr");
+    for(const cityTile of cityRow){
+        tr.appendChild(makeTD(cityTile));
+    }
+    return tr;
+}
+
+// TODO: REWRITE THIS FUNCTION
+function makeTD(cityTile){
+    const options = [ 
+        "factory", 
+        "shop", 
+        "park", 
+        "tavern",
+        "office",  
+        "house", 
+        "civic", 
+        "empty",
+        "bridge"
+    ];
+
+    const td = document.createElement("td"); // create table data (cell)
+
+    // hidden field to track what tile is here for rescoring on change
+    const hiddenID = document.createElement("input");
+    hiddenID.type = "hidden";
+    hiddenID.value = cityTile;
+    td.appendChild(hiddenID);
+
+    const td_dropdown = document.createElement("select"); // create dropdown
+
+    // fill dropdown options
+    for(const op of options){
+        const option = document.createElement("option");
+        option.innerText = op;
+        option.value = op;
+        td_dropdown.appendChild(option);
+    }
+    td_dropdown.value = cityTile.split(" ")[0]; // fill selected option
+    td.appendChild(td_dropdown); // attach dropdown to table cell
+    
+    fillIcon(cityTile, td); // fill table cell icon
+
+    // Change the tile when the dropdown is changed
+    td_dropdown.addEventListener("change", async () => {
+        const firstChildHiddenID = td.firstChild; // get the identification of the td
+        const secondChildDropdown = td.children[1]; // get the dropdown so it stays
+        const thirdChildImg = td.children[2]; // get the first img to overwrite it
+
+        // Remove all children except the dropdown and the base img
+        for (const child of Array.from(td.children)) {
+            if (child !== firstChildHiddenID && child !== secondChildDropdown && child !== thirdChildImg) {
+                td.removeChild(child);
+            }
+        }
+
+        const tileType = td_dropdown.value; // find what the dropdown changed to
+        thirdChildImg.src = `/static/icons/${tileType}_icon.png`; // change the base image
+
+        //if tileType is tavern, civic, or bridge pick options
+        if(tileType === "tavern"){
+            const type = await selectTavern();
+            thirdChildImg.src = `/static/icons/${tileType}_${type}_icon.png`;
+            firstChildHiddenID.value = `${tileType} ${type}`; // update the hidden field
+        } else if(tileType === "civic"){
+            // TODO: figure out civic type via civic modal
+            // TODO: overlay civic bonuses
+            const { bonus1, bonus2, negative } = await selectCivic();
+            thirdChildImg.src = `/static/icons/${tileType}_icon.png`;
+
+            const overlayImg1 = document.createElement("img");
+            overlayImg1.src = `/static/icons/${bonus1}_icon.png`;
+            overlayImg1.classList.add("imgOverlay");
+            overlayImg1.classList.add("imgOverlay1");
+            td.appendChild(overlayImg1);
+
+            const overlayImg2 = document.createElement("img");
+            overlayImg2.src = `/static/icons/${bonus2}_icon.png`;
+            overlayImg2.classList.add("imgOverlay");
+            overlayImg2.classList.add("imgOverlay2");
+            td.appendChild(overlayImg2);
+
+            const overlayImg3 = document.createElement("img");
+            overlayImg3.src = `/static/icons/${negative}_icon.png`;
+            overlayImg3.classList.add("imgOverlay");
+            overlayImg3.classList.add("imgOverlay3");
+            td.appendChild(overlayImg3);
+
+            firstChildHiddenID.value = `${tileType} ${bonus1} ${bonus2} ${negative}`; // update the hidden field
+        } else if(tileType === "bridge"){
+            const type = await selectBridge();
+            thirdChildImg.src = `/static/icons/${tileType}_${type}_icon.png`
+            firstChildHiddenID.value = `${tileType} ${type}`; // update the hidden field
+        } else {
+            firstChildHiddenID.value = tileType; // update the hidden field
+        }
+
+        populateScore(); // recalculate the score
+    });
+    return td;
+}
+
+function fillIcon(tile, td){
+    tile = tile.split(" ");
+    if(tile[0] === "tavern"){
+        const baseImg = document.createElement("img");
+        baseImg.src = `/static/icons/${tile[0]}_${tile[1]}_icon.png`;
+        baseImg.classList.add('baseImg');
+        td.appendChild(baseImg);
+    } else if(tile[0] === "civic"){
+        const baseImg = document.createElement("img");
+        baseImg.src = `/static/icons/${tile[0]}_icon.png`;
+        td.appendChild(baseImg);
+
+        const overlayImg1 = document.createElement("img");
+        overlayImg1.src = `/static/icons/${tile[1]}_icon.png`;
+        overlayImg1.classList.add("imgOverlay");
+        overlayImg1.classList.add("imgOverlay1");
+        td.appendChild(overlayImg1);
+
+        const overlayImg2 = document.createElement("img");
+        overlayImg2.src = `/static/icons/${tile[2]}_icon.png`;
+        overlayImg2.classList.add("imgOverlay");
+        overlayImg2.classList.add("imgOverlay2");
+        td.appendChild(overlayImg2);
+
+        const overlayImg3 = document.createElement("img");
+        overlayImg3.src = `/static/icons/${tile[3]}_icon.png`;
+        overlayImg3.classList.add("imgOverlay");
+        overlayImg3.classList.add("imgOverlay3");
+        td.appendChild(overlayImg3);
+
+    } else if(tile[0] === "bridge"){
+        const baseImg = document.createElement("img");
+        baseImg.src = `/static/icons/${tile[0]}_${tile[1]}_icon.png`;
+        td.appendChild(baseImg);
+    } else {
+        const baseImg = document.createElement("img");
+        baseImg.src = `/static/icons/${tile[0]}_icon.png`;
+        td.appendChild(baseImg);
+    }
+}
+
+function selectTavern() {
+    return new Promise(resolve => {
+        const modal = document.getElementById("tavern-modal");
+        modal.style.display = "block";
+
+        const radios = document.querySelectorAll('input[name="tavern"]');
+
+        // ✅ Clear previous selection
+        radios.forEach(r => r.checked = false);
+
+        function handler(event) {
+            const selectedValue = event.target.value;
+            modal.style.display = "none";
+
+            // Clean up event listeners
+            radios.forEach(r => r.removeEventListener('change', handler));
+
+            resolve(selectedValue);
+        }
+
+        radios.forEach(r => r.addEventListener('change', handler));
+    });
+}
+
+
+function selectCivic() {
+    return new Promise(resolve => {
+        const modal = document.getElementById("civic-modal");
+        const confirmBtn = document.getElementById("civic-confirm-btn");
+
+        modal.style.display = "block";
+
+        function handleConfirm() {
+            const bonus1 = document.getElementById("civic-bonus1-dropdown").value;
+            const bonus2 = document.getElementById("civic-bonus2-dropdown").value;
+            const negative = document.getElementById("civic-negative-dropdown").value;
+
+            modal.style.display = "none";
+
+            confirmBtn.removeEventListener("click", handleConfirm);
+
+            resolve({ bonus1, bonus2, negative });
+            populateScore();
+        }
+
+        confirmBtn.addEventListener("click", handleConfirm);
+    });
+}
+
+function selectBridge() {
+    return new Promise(resolve => {
+        const modal = document.getElementById("bridge-modal");
+        modal.style.display = "block";
+
+        const radios = document.querySelectorAll('input[name="bridge"]');
+
+        // ✅ Clear previous selection
+        radios.forEach(r => r.checked = false);
+
+        function handler(event) {
+            const selectedValue = event.target.value;
+            modal.style.display = "none";
+
+            // Clean up event listeners
+            radios.forEach(r => r.removeEventListener('change', handler));
+
+            resolve(selectedValue);
+        }
+
+        radios.forEach(r => r.addEventListener('change', handler));
+    });
+}
+
+
 // TODO: WRITE SCORE FUNCTION HELPERS
 function scoreCity(cityTiles){
     return {
@@ -288,251 +549,6 @@ function scoreFactories(cityTiles){
     return factoryValue * numFactories;
 }
 
-function populateScore(){
-    const cityTiles = getCityTiles();
-    const scores = scoreCity(cityTiles);
-
-    const d1Score = Number(document.getElementById("district1-score-input").value);
-    const d2Score = Number(document.getElementById("district2-score-input").value);
-    const d3Score = Number(document.getElementById("district3-score-input").value);
-
-    document.getElementById("district1-score").innerText = d1Score;
-    document.getElementById("district2-score").innerText = d2Score;
-    document.getElementById("district3-score").innerText = d3Score;
-
-    document.getElementById("shop-score").innerText = scores.shop_score;
-    document.getElementById("factory-score").innerText = scores.factory_score;
-    document.getElementById("park-score").innerText = scores.park_score;
-    document.getElementById("office-score").innerText = scores.office_score;
-    document.getElementById("tavern-score").innerText = scores.tavern_score;
-    document.getElementById("house-score").innerText = scores.house_score;
-    document.getElementById("civic-score").innerText = scores.civic_score;
-
-    let total = scores.factory_score
-        + scores.shop_score
-        + scores.park_score
-        + scores.office_score
-        + scores.tavern_score
-        + scores.house_score
-        + scores.civic_score
-        + d1Score + d2Score + d3Score;
-
-    document.getElementById("total-score-box").innerText = total;
-    document.getElementById("total-score-heading").innerText = total;
-}
-
-// Functions to fill in the city tile grid
-function fillCityTable(){
-    const cityTable = document.getElementById("city-board-tiles");
-    const cityTiles = JSON.parse(document.getElementById("city-tiles").value.replaceAll("\'", "\""));
-
-    for(const cityRow of cityTiles){
-        cityTable.appendChild(makeTR(cityRow));
-    }
-}
-
-function makeTR(cityRow){
-    const tr = document.createElement("tr");
-    for(const cityTile of cityRow){
-        tr.appendChild(makeTD(cityTile));
-    }
-    return tr;
-}
-
-// TODO: REWRITE THIS FUNCTION
-function makeTD(cityTile){
-    const options = [ 
-        "factory", 
-        "shop", 
-        "park", 
-        "tavern",
-        "office",  
-        "house", 
-        "civic", 
-        "empty",
-        "bridge"
-    ];
-
-    const td = document.createElement("td"); // create table data (cell)
-
-    // hidden field to track what tile is here for rescoring on change
-    const hiddenID = document.createElement("input");
-    hiddenID.type = "hidden";
-    hiddenID.value = cityTile;
-    td.appendChild(hiddenID);
-
-    const td_dropdown = document.createElement("select"); // create dropdown
-
-    // fill dropdown options
-    for(const op of options){
-        const option = document.createElement("option");
-        option.innerText = op;
-        option.value = op;
-        td_dropdown.appendChild(option);
-    }
-    td_dropdown.value = cityTile.split(" ")[0]; // fill selected option
-    td.appendChild(td_dropdown); // attach dropdown to table cell
-    
-    fillIcon(cityTile, td); // fill table cell icon
-
-    // Change the tile when the dropdown is changed
-    td_dropdown.addEventListener("change", async () => {
-        const firstChildHiddenID = td.firstChild; // get the identification of the td
-        const secondChildDropdown = td.children[1]; // get the dropdown so it stays
-        const thirdChildImg = td.children[2]; // get the first img to overwrite it
-
-        // Remove all children except the dropdown and the base img
-        for (const child of Array.from(td.children)) {
-            if (child !== firstChildHiddenID && child !== secondChildDropdown && child !== thirdChildImg) {
-                td.removeChild(child);
-            }
-        }
-
-        const tileType = td_dropdown.value; // find what the dropdown changed to
-        thirdChildImg.src = `/static/icons/${tileType}_icon.png`; // change the base image
-
-        //if tileType is tavern, civic, or bridge pick options
-        if(tileType === "tavern"){
-            const type = await selectTavern();
-            thirdChildImg.src = `/static/icons/${tileType}_${type}_icon.png`;
-            firstChildHiddenID.value = `${tileType} ${type}`; // update the hidden field
-        } else if(tileType === "civic"){
-            // TODO: figure out civic type via civic modal
-            // TODO: overlay civic bonuses
-            const { bonus1, bonus2, negative } = await selectCivic();
-            thirdChildImg.src = `/static/icons/${tileType}_icon.png`;
-
-            const overlayImg1 = document.createElement("img");
-            overlayImg1.src = `/static/icons/${bonus1}_icon.png`;
-            overlayImg1.classList.add("imgOverlay");
-            overlayImg1.classList.add("imgOverlay1");
-            td.appendChild(overlayImg1);
-
-            const overlayImg2 = document.createElement("img");
-            overlayImg2.src = `/static/icons/${bonus2}_icon.png`;
-            overlayImg2.classList.add("imgOverlay");
-            overlayImg2.classList.add("imgOverlay2");
-            td.appendChild(overlayImg2);
-
-            const overlayImg3 = document.createElement("img");
-            overlayImg3.src = `/static/icons/${negative}_icon.png`;
-            overlayImg3.classList.add("imgOverlay");
-            overlayImg3.classList.add("imgOverlay3");
-            td.appendChild(overlayImg3);
-
-            firstChildHiddenID.value = `${tileType} ${bonus1} ${bonus2} ${negative}`; // update the hidden field
-        } else if(tileType === "bridge"){
-            const type = await selectBridge();
-            thirdChildImg.src = `/static/icons/${tileType}_${type}_icon.png`
-            firstChildHiddenID.value = `${tileType} ${type}`; // update the hidden field
-        } else {
-            firstChildHiddenID.value = tileType; // update the hidden field
-        }
-
-        populateScore(); // recalculate the score
-    });
-    return td;
-}
-
-function fillIcon(tile, td){
-    tile = tile.split(" ");
-    if(tile[0] === "tavern"){
-        const baseImg = document.createElement("img");
-        baseImg.src = `/static/icons/${tile[0]}_${tile[1]}_icon.png`;
-        baseImg.classList.add('baseImg');
-        td.appendChild(baseImg);
-    } else if(tile[0] === "civic"){
-        const baseImg = document.createElement("img");
-        baseImg.src = `/static/icons/${tile[0]}_icon.png`;
-        td.appendChild(baseImg);
-
-        const overlayImg1 = document.createElement("img");
-        overlayImg1.src = `/static/icons/${tile[1]}_icon.png`;
-        overlayImg1.classList.add("imgOverlay");
-        overlayImg1.classList.add("imgOverlay1");
-        td.appendChild(overlayImg1);
-
-        const overlayImg2 = document.createElement("img");
-        overlayImg2.src = `/static/icons/${tile[2]}_icon.png`;
-        overlayImg2.classList.add("imgOverlay");
-        overlayImg2.classList.add("imgOverlay2");
-        td.appendChild(overlayImg2);
-
-        const overlayImg3 = document.createElement("img");
-        overlayImg3.src = `/static/icons/${tile[3]}_icon.png`;
-        overlayImg3.classList.add("imgOverlay");
-        overlayImg3.classList.add("imgOverlay3");
-        td.appendChild(overlayImg3);
-
-    } else if(tile[0] === "bridge"){
-        const baseImg = document.createElement("img");
-        baseImg.src = `/static/icons/${tile[0]}_${tile[1]}_icon.png`;
-        td.appendChild(baseImg);
-    } else {
-        const baseImg = document.createElement("img");
-        baseImg.src = `/static/icons/${tile[0]}_icon.png`;
-        td.appendChild(baseImg);
-    }
-}
-
-function selectTavern() {
-    return new Promise(resolve => {
-        document.getElementById("tavern-modal").style.display = "block";
-        const radios = document.querySelectorAll('input[name="tavern"]');
-
-        function handler(event) {
-            const selectedValue = event.target.value;
-            document.getElementById("tavern-modal").style.display = "none";
-
-            // Clean up event listeners
-            radios.forEach(r => r.removeEventListener('change', handler));
-
-            resolve(selectedValue); // Return the selected value
-        }
-        radios.forEach(r => r.addEventListener('change', handler));
-    });
-}
-
-function selectCivic() {
-    return new Promise(resolve => {
-        const modal = document.getElementById("civic-modal");
-        const confirmBtn = document.getElementById("civic-confirm-btn");
-
-        modal.style.display = "block";
-
-        function handleConfirm() {
-            const bonus1 = document.getElementById("civic-bonus1-dropdown").value;
-            const bonus2 = document.getElementById("civic-bonus2-dropdown").value;
-            const negative = document.getElementById("civic-negative-dropdown").value;
-
-            modal.style.display = "none";
-
-            confirmBtn.removeEventListener("click", handleConfirm);
-
-            resolve({ bonus1, bonus2, negative });
-        }
-
-        confirmBtn.addEventListener("click", handleConfirm);
-    });
-}
-
-function selectBridge(){
-    return new Promise(resolve => {
-        document.getElementById("bridge-modal").style.display = "block";
-        const radios = document.querySelectorAll('input[name="bridge"]');
-
-        function handler(event) {
-            const selectedValue = event.target.value;
-            document.getElementById("bridge-modal").style.display = "none";
-
-            // Clean up event listeners
-            radios.forEach(r => r.removeEventListener('change', handler));
-
-            resolve(selectedValue); // Return the selected value
-        }
-        radios.forEach(r => r.addEventListener('change', handler));
-    });
-}
 
 function getCityTiles(){
     // get the city tiles from the hidden inputs in the tds

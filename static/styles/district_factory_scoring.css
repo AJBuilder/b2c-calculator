@@ -44,6 +44,12 @@
     background-color: #f0f0f0;
 }
 
+#district-scoring input {
+    font-size: 18px;
+    padding: 5px;
+    min-width: 20px;
+}
+
 #factory-scoring {
     width: 100%;
     border-bottom: 1px solid #aaa;
@@ -72,14 +78,10 @@
 }
 
 /* Ensure labels and dropdowns are properly aligned */
-.label {
+#district-scoring label {
     font-size: 25px;
     color: gray;
     text-align: right;
-}
-
-#district-scoring input {
-    min-width: 20px;
 }
 
 /* Dropdown styling */

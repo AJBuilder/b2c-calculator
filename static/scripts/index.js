@@ -22,6 +22,7 @@ window.addEventListener("DOMContentLoaded", async () => {
                 imageLabel.style.width = "90vw";
                 imageLabel.innerHTML = `<img src="${e.target.result}" alt="Uploaded Image">`;
                 document.getElementById("image-submit").style.backgroundColor = "red";
+                document.getElementById("image-submit").addEventListener('click', loadScreen)
             };
             reader.readAsDataURL(file);
         }
@@ -36,3 +37,8 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
 
 });
+
+function loadScreen(){
+    document.getElementById('loader-background').style.display = 'block';
+    document.getElementById('loader').style.display = 'block';
+}

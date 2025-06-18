@@ -5,8 +5,9 @@ from city_identification import CivicTileTypes, GenericCityTileTypes, TavernTile
 
 # Setup and Config
 app = Flask(__name__, static_folder='static', template_folder='templates')
-# TODO: FOLDER TO SAVE IMAGES TO WILL NOT BE NEEDED IN THE FUTURE -> REMOVE WHEN READY
-app.config['UPLOAD_FOLDER'] = 'uploads'  # Folder where images will be stored
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app.config['UPLOAD_FOLDER'] = os.path.join(BASE_DIR, 'uploads')  # Folder where images will be stored
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Limit file size to 16MB
 
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -87,7 +88,10 @@ def get_calculator():
             return render_template("index.html", city_tiles=city_tiles, scored=True)
         else:
             # Rename the file
-            file.filename = f"file{len([f for f in os.listdir('uploads') if os.path.isfile(os.path.join('uploads', f))]) + 1}.jpg"
+            upload_dir = app.config['UPLOAD_FOLDER']
+            file_count = len([f for f in os.listdir(upload_dir) if os.path.isfile(os.path.join(upload_dir, f))])
+            file.filename = f"file{file_count + 1}.jpg"
+            file_path = os.path.join(upload_dir, file.filename)
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
             file.save(file_path)
             

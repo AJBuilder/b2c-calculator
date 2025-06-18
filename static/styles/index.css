@@ -171,19 +171,27 @@
     display: none;
     width: 100vw;
     height: 100vh;
-    color: gray;
-    opacity: 50%;
+    background-color: rgba(0, 0, 0, 0.5); /* cleaner way to do opacity */
+    position: fixed; 
+    top: 0;
+    left: 0;
+    z-index: 1000; /* ensure it's on top of everything */
 }
 
 .loader {
     display: none;
-    border: 16px solid #f3f3f3; /* Light grey */
-    border-top: 16px solid #3498db; /* Blue */
+    border: 16px solid #f3f3f3;
+    border-top: 16px solid #3498db;
     border-radius: 50%;
     width: 120px;
     height: 120px;
     animation: spin 2s linear infinite;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* centers the loader */
 }
+
 
 @keyframes spin {
     0% { transform: rotate(0deg); }

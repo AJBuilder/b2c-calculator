@@ -39,6 +39,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 });
 
 function loadScreen(){
+    console.log("button pressed");
     document.getElementById('loader-background').style.display = 'block';
     document.getElementById('loader').style.display = 'block';
 }

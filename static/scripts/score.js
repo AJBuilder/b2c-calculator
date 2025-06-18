@@ -495,7 +495,7 @@ function scoreHouses(cityTiles){
         }
     }
     if(houseScore == 0){ // extremly unlikely, perhaps even impossible
-        return numHouses*1;
+        return (numScoringHouses+numFactoryHouses)*1;
     }
     return ((numScoringHouses*houseScore) + (numFactoryHouses));
 }

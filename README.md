@@ -10,10 +10,5 @@ TO RUN FLASK APP:
 
 
 ISSUES:
-- image processor needs to return a 5x5 always
-- test scoring functions more vigorously (especially shops)
-    - Civic scoring wrong
-- District scoring (ties)
-- UI for civics
-- General Styling
 - Tuning Civic and Tavern identification
+- loading screen come up on back button from scoring screen

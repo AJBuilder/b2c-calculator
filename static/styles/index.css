@@ -178,7 +178,7 @@
     z-index: 1000; /* ensure it's on top of everything */
 }
 
-.loader {
+#loader {
     display: none;
     border: 16px solid #f3f3f3;
     border-top: 16px solid #3498db;
@@ -189,19 +189,39 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); /* centers the loader */
 }
 
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 /* ------------------------------------------------------------------------------------------- */
 
 /* ------------------------------------------------------------------------------------------- */
-/* Back Link */
+/* Back Button */
 
+#back-btn {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px; /* optional spacing */
+}
 
+#back-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #3498db; /* blue color */
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px; /* slight rounding */
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+#back-link:hover {
+    background-color: #2c80b4;
+}
 
 /* ------------------------------------------------------------------------------------------- */

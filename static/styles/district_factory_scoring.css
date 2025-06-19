@@ -1,20 +1,25 @@
 /* ------------------------------------------------------------------------------------------- */
 /* District Scoring Area */
-#district-collapsible {
+
+.section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     background-color: white;
     color: gray;
-    padding-top: 7px;
-    padding-bottom: 7px;
-    padding-left: 5px;
-    padding-right: 5px;
+    padding: 7px 5px;
     width: 100%;
-    border-bottom: 1px solid #aaa;
-    text-align: left;
     font-size: 100%;
+    text-align: left;
+}
+
+#factory-scoring {
+    border-bottom: 1px solid #aaa;
+}
+
+#district-collapsible {
     cursor: pointer;
+    border-bottom: 1px solid #aaa;
 }
 
 #downArrow {
@@ -30,6 +35,8 @@
     text-decoration: none;
     overflow: hidden;
     white-space: nowrap;
+    position: relative;
+    right: 20px;
 }
 /* ------------------------------------------------------------------------------------------- */
 
@@ -48,24 +55,6 @@
     font-size: 18px;
     padding: 5px;
     min-width: 20px;
-}
-
-#factory-scoring {
-    width: 100%;
-    border-bottom: 1px solid #aaa;
-    padding: 7px 5px; 
-}
-#factory-scoring .label {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: white;
-    color: gray;
-    padding-left: 5px;
-    padding-right: 5px;
-    width: 100%;
-    text-align: left;
-    font-size: 100%;
 }
 
 /* Align label and dropdown side by side */

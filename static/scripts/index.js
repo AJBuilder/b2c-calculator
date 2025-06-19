@@ -1,5 +1,9 @@
 window.addEventListener("DOMContentLoaded", async () => {
 
+    // MAKE SURE LOADER IS HIDDEN AT FIRST (EVEN ON BACK BUTTON PRESS)
+    document.getElementById('loader-background').style.display = 'none';
+    document.getElementById('loader').style.display = 'none';
+
     // District Collapsible Element
     document.getElementById("district-collapsible").addEventListener("click", () => {
         const dropdowns = document.getElementById("district-scoring");
@@ -39,7 +43,6 @@ window.addEventListener("DOMContentLoaded", async () => {
 });
 
 function loadScreen(){
-    console.log("button pressed");
     document.getElementById('loader-background').style.display = 'block';
     document.getElementById('loader').style.display = 'block';
 }

@@ -27,7 +27,10 @@
         </div>
 
         <div id="district-selection">
-            <button id="district-collapsible"> <h1>Districts</h1> <a href="#" id="downArrow"></a> </button>
+            <div id="district-collapsible" class="section-header">
+                <h1>Districts</h1>
+                <a href="#" id="downArrow"></a>
+            </div>
             
             <div id="district-scoring">
                 <div class="district-row">
@@ -46,7 +49,9 @@
         </div>
         <div id="factory-scoring">
             <div class="factory-row">
-                <label class="label" for="factory-dropdown"> <h1>Factory Score:</h1> </label>
+                <div class="section-header">
+                    <h1>Factory Score:</h1>
+                </div>
                 <select class="selection" name="factory-dropdown" id="factory-dropdown">
                     <option value="2">2</option>
                     <option value="3">3</option>
@@ -121,9 +126,11 @@
             </div>
         </div>
 
-        <div id="back-btn">
-            <a id="back-link" href="/Calculator"> Go Back </a>
-        </div>
+        {% if scored %}
+            <div id="back-btn">
+                <a id="back-link" href="/Calculator"> Go Back </a>
+            </div>
+        {% endif %}
 
         <div id="tavern-modal">
             <div id="tavern-selection">
@@ -179,15 +186,7 @@
         </div>
 
         <div id="footer">
-            <a target="_blank" href="https://icons8.com/icon/2760/expand-arrow">Down Arrow</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-            <br>
-            <a target="_blank" href="https://icons8.com/icon/11772/camera">Camera</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-            <br>
-            <a target="_blank" href="https://icons8.com/icon/bG8gr4NV0bLg/empty-bed">Bed</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-            <br>
-            <a target="_blank" href="https://icons8.com/icon/7vKkzvo3CW5U/beer-mug">Beer Mug</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-            <br>
-            <a target="_blank" href="https://icons8.com/icon/7uTadNKz7Brz/restaurant">Restaurant</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>            
+            <p>Icons By <a target="_blank" href="https://icons8.com">Icons8</a> </p>
         </div>
     
     </div>

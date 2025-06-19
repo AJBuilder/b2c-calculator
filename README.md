@@ -11,4 +11,4 @@ TO RUN FLASK APP:
 
 ISSUES:
 - Tuning Civic and Tavern identification
-- loading screen come up on back button from scoring screen
+- Style civic selection to look a bit nicer

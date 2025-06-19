@@ -1,9 +1,14 @@
+
+window.addEventListener("pageshow", function (event) {
+    if (event.persisted) {
+        // MAKE SURE LOADER IS HIDDEN AT FIRST (EVEN ON BACK BUTTON PRESS)
+        document.getElementById('loader-background').style.display = 'none';
+        document.getElementById('loader').style.display = 'none';
+    }
+});
+
 window.addEventListener("DOMContentLoaded", async () => {
-
-    // MAKE SURE LOADER IS HIDDEN AT FIRST (EVEN ON BACK BUTTON PRESS)
-    document.getElementById('loader-background').style.display = 'none';
-    document.getElementById('loader').style.display = 'none';
-
+    
     // District Collapsible Element
     document.getElementById("district-collapsible").addEventListener("click", () => {
         const dropdowns = document.getElementById("district-scoring");
